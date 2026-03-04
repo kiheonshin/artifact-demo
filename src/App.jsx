@@ -1,7 +1,7 @@
 import { useReducer, useState, useEffect, useRef, useCallback, useMemo } from "react";
 
 // ─────────────────────────────────────────────
-// 🏨 Hotel IDYLL — 데모 게임 (Prompt 1 + 2)
+// 🏨 Hotel Tamaverse — 데모 게임 (Prompt 1 + 2)
 // 단일 .jsx 파일 · React + Tailwind · useReducer
 // ─────────────────────────────────────────────
 
@@ -41,10 +41,10 @@ const MODAL_W = { width: 520, minWidth: 520, maxWidth: 520, boxSizing: "border-b
 
 const INITIAL_LOCATIONS = [
   { id: "lobby", name: "Lobby", floor: "1F", emoji: "🛋️", minVersion: "1.0", isLocked: false, currentNpcs: [] },
-  { id: "cafe", name: "Idyll Brew", floor: "1F", emoji: "☕", minVersion: "1.0", isLocked: false, currentNpcs: [] },
+  { id: "cafe", name: "Tamaverse Brew", floor: "1F", emoji: "☕", minVersion: "1.0", isLocked: false, currentNpcs: [] },
   { id: "rooms", name: "Rooms", floor: "2F", emoji: "🛏️", minVersion: "1.0", isLocked: false, currentNpcs: [] },
   { id: "restaurant", name: "The Table", floor: "3F", emoji: "🍽️", minVersion: "1.0", isLocked: false, currentNpcs: [] },
-  { id: "stage", name: "Stage IDYLL", floor: "4F", emoji: "🎭", minVersion: "1.1", isLocked: true, currentNpcs: [] },
+  { id: "stage", name: "Stage Tamaverse", floor: "4F", emoji: "🎭", minVersion: "1.1", isLocked: true, currentNpcs: [] },
   { id: "skyline", name: "Skyline", floor: "5F", emoji: "🌆", minVersion: "1.2", isLocked: true, currentNpcs: [] },
   { id: "vending", name: "Vending Corner", floor: "B1F", emoji: "🏪", minVersion: "1.2", isLocked: true, currentNpcs: [] },
 ];
@@ -191,7 +191,7 @@ const VERSION_UPDATES = {
   "1.1": {
     title: "v1.1 — 콘텐츠 확장",
     features: [
-      { emoji: "🎭", text: "4F 스테이지 IDYLL 개방" },
+      { emoji: "🎭", text: "4F 스테이지 Tamaverse 개방" },
       { emoji: "🎨", text: "공동창작 라이브러리: 새 아이템 & 이벤트" },
       { emoji: "☕", text: "MORI 커피 콜라보레이션 메뉴" },
       { emoji: "🧥", text: "LUNA 패션 브랜디드 아이템" },
@@ -527,10 +527,10 @@ const DIARY_TEMPLATES = [
 ];
 
 const SNS_TEMPLATES = [
-  (n, loc) => ({ platform: "idyll_gram", handle: `@${n.name.toLowerCase().replace(/\s/g, "_")}`, body: `📍 ${loc}에서 보내는 여유로운 오후`, hashtags: [`#HotelIDYLL`, `#${n.interests[0]}`, `#호텔라이프`, `#${loc.replace(/\s/g, "")}`], likes: Math.floor(Math.random() * 200) + 50, comments: [{ user: "호텔지기", text: "좋은 시간 보내세요! ✨" }], img: "☕🏨" }),
-  (n) => ({ platform: "idyll_gram", handle: `@${n.name.toLowerCase().replace(/\s/g, "_")}`, body: `오늘 하루도 감사한 마음으로 ✨\n이 호텔에서의 매일이 선물 같다`, hashtags: [`#일상`, `#${n.interests[0]}`, `#호텔생활`, `#감성`], likes: Math.floor(Math.random() * 150) + 30, comments: [{ user: "여행자", text: "분위기 최고 👏" }, { user: "감성러버", text: "나도 가고 싶다 🥺" }], img: "✨🌿" }),
-  (n, loc) => ({ platform: "idyll_gram", handle: `@${n.name.toLowerCase().replace(/\s/g, "_")}`, body: `${loc}의 분위기에 취하는 중 🏨\n${n.interests[0]}을(를) 좋아하는 사람이라면 꼭 와봐야 할 곳`, hashtags: [`#${n.interests[1] || n.interests[0]}`, `#IDYLL`, `#추천`, `#힐링`], likes: Math.floor(Math.random() * 300) + 80, comments: [{ user: "팔로워1", text: "여기 어디야?!" }, { user: "팔로워2", text: "사진 더 올려줘 📸" }], img: "🏨🌅" }),
-  (n, loc) => ({ platform: "idyll_gram", handle: `@${n.name.toLowerCase().replace(/\s/g, "_")}`, body: `오늘의 ${n.interests[0]} 기록 📝\n매일 조금씩 성장하는 느낌이 좋다`, hashtags: [`#성장`, `#${n.interests[0]}일기`, `#호텔IDYLL`, `#기록`], likes: Math.floor(Math.random() * 120) + 40, comments: [{ user: "응원단", text: "멋져요! 화이팅! 💪" }], img: "📝💪" }),
+  (n, loc) => ({ platform: "Tamaverse_gram", handle: `@${n.name.toLowerCase().replace(/\s/g, "_")}`, body: `📍 ${loc}에서 보내는 여유로운 오후`, hashtags: [`#HotelTamaverse`, `#${n.interests[0]}`, `#호텔라이프`, `#${loc.replace(/\s/g, "")}`], likes: Math.floor(Math.random() * 200) + 50, comments: [{ user: "호텔지기", text: "좋은 시간 보내세요! ✨" }], img: "☕🏨" }),
+  (n) => ({ platform: "Tamaverse_gram", handle: `@${n.name.toLowerCase().replace(/\s/g, "_")}`, body: `오늘 하루도 감사한 마음으로 ✨\n이 호텔에서의 매일이 선물 같다`, hashtags: [`#일상`, `#${n.interests[0]}`, `#호텔생활`, `#감성`], likes: Math.floor(Math.random() * 150) + 30, comments: [{ user: "여행자", text: "분위기 최고 👏" }, { user: "감성러버", text: "나도 가고 싶다 🥺" }], img: "✨🌿" }),
+  (n, loc) => ({ platform: "Tamaverse_gram", handle: `@${n.name.toLowerCase().replace(/\s/g, "_")}`, body: `${loc}의 분위기에 취하는 중 🏨\n${n.interests[0]}을(를) 좋아하는 사람이라면 꼭 와봐야 할 곳`, hashtags: [`#${n.interests[1] || n.interests[0]}`, `#Tamaverse`, `#추천`, `#힐링`], likes: Math.floor(Math.random() * 300) + 80, comments: [{ user: "팔로워1", text: "여기 어디야?!" }, { user: "팔로워2", text: "사진 더 올려줘 📸" }], img: "🏨🌅" }),
+  (n, loc) => ({ platform: "Tamaverse_gram", handle: `@${n.name.toLowerCase().replace(/\s/g, "_")}`, body: `오늘의 ${n.interests[0]} 기록 📝\n매일 조금씩 성장하는 느낌이 좋다`, hashtags: [`#성장`, `#${n.interests[0]}일기`, `#호텔Tamaverse`, `#기록`], likes: Math.floor(Math.random() * 120) + 40, comments: [{ user: "응원단", text: "멋져요! 화이팅! 💪" }], img: "📝💪" }),
 ];
 
 // ── 엔진 함수: NPC 위치 결정 ──
@@ -620,7 +620,7 @@ function useSimulationEngine(state, dispatch) {
         pending.forEach(pa => {
           if (currentAbs >= pa.arrivalAbs) {
             dispatch({ type: ACTION.ARRIVE_PENDING_NPC, payload: pa.npc });
-            dispatch({ type: ACTION.ADD_FEED_ITEM, payload: { id: nextFeedId(), type: "event", text: `🧳 ${pa.npc.emoji} ${pa.npc.name}이(가) Hotel IDYLL에 체크인했습니다!`, time: timeStr, day: actualDay } });
+            dispatch({ type: ACTION.ADD_FEED_ITEM, payload: { id: nextFeedId(), type: "event", text: `🧳 ${pa.npc.emoji} ${pa.npc.name}이(가) Hotel Tamaverse에 체크인했습니다!`, time: timeStr, day: actualDay } });
             dispatch({ type: ACTION.ADD_EVENT_LOG, payload: { type: "checkin", title: `${pa.npc.name} 체크인`, description: `${pa.npc.description} ${pa.npc.name}이(가) 호텔에 입주했습니다.`, day: actualDay, time: timeStr, npcsInvolved: [pa.npc.id] } });
           }
         });
@@ -738,7 +738,7 @@ function useSimulationEngine(state, dispatch) {
       if (Math.random() < 0.08) {
         const events = [
           { title: "갑자기 비가 내린다", desc: "호텔 안의 NPC들이 창밖을 바라보며 생각에 잠겼다.", emoji: "🌧️" },
-          { title: "카페 특별 메뉴", desc: "Idyll Brew에서 오늘의 특별 메뉴가 공개되었다.", emoji: "☕" },
+          { title: "카페 특별 메뉴", desc: "Tamaverse Brew에서 오늘의 특별 메뉴가 공개되었다.", emoji: "☕" },
           { title: "노을이 아름답다", desc: "서쪽 하늘이 붉게 물들었다. 스카이라인에서 보면 장관일 것이다.", emoji: "🌅" },
           { title: "택배가 도착했다", desc: "누군가에게 소포가 배달되었다. 무엇이 들어있을까?", emoji: "📦" },
           { title: "BGM 변경", desc: "호텔에 잔잔한 재즈 음악이 흐르기 시작했다.", emoji: "🎶" },
@@ -751,8 +751,8 @@ function useSimulationEngine(state, dispatch) {
       // ── 5-B. 브랜디드 이벤트 (v1.1+) ──
       if (versionGte(s.currentVersion, "1.1") && Math.random() < 0.04) {
         const brandedEvents = [
-          { cond: true, text: "☕ Idyll Brew에 MORI Coffee 시즌 라떼가 추가되었습니다!", title: "MORI Coffee 라떼 런칭", coupon: { emoji: "☕", title: "MORI Coffee 50% 할인", desc: "NPC가 MORI 라떼를 마셔서 획득!" } },
-          { cond: period === "evening", text: "🎵 스테이지 IDYLL에서 음악실 오픈마이크가 시작됩니다!", title: "음악실 오픈마이크" },
+          { cond: true, text: "☕ Tamaverse Brew에 MORI Coffee 시즌 라떼가 추가되었습니다!", title: "MORI Coffee 라떼 런칭", coupon: { emoji: "☕", title: "MORI Coffee 50% 할인", desc: "NPC가 MORI 라떼를 마셔서 획득!" } },
+          { cond: period === "evening", text: "🎵 스테이지 Tamaverse에서 음악실 오픈마이크가 시작됩니다!", title: "음악실 오픈마이크" },
         ];
         if (versionGte(s.currentVersion, "1.2")) {
           brandedEvents.push({ cond: true, text: "🧥 루나(LUNA Fashion)가 패션 팝업스토어를 열고 있습니다!", title: "LUNA Fashion 팝업", coupon: { emoji: "🧥", title: "LUNA Fashion 10% 할인", desc: "루나와 패션 대화를 해서 획득!" } });
@@ -923,7 +923,7 @@ function IntroScreen({ dispatch }) {
         ))}
       </div>
       <div className="text-8xl mb-4" style={{ animation: "fadeInUp 0.6s ease-out both", filter: "drop-shadow(0 4px 24px rgba(233,69,96,0.3))" }}>🏨</div>
-      <h1 className="text-6xl font-bold tracking-tight mb-3" style={{ fontFamily: "'Playfair Display', serif", background: "linear-gradient(135deg, #e94560, #ff6b6b)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", animation: "fadeInUp 0.6s ease-out 0.2s both, titleGlow 3s ease-in-out infinite", letterSpacing: "-1px" }}>Hotel IDYLL</h1>
+      <h1 className="text-6xl font-bold tracking-tight mb-3" style={{ fontFamily: "'Playfair Display', serif", background: "linear-gradient(135deg, #e94560, #ff6b6b)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", animation: "fadeInUp 0.6s ease-out 0.2s both, titleGlow 3s ease-in-out infinite", letterSpacing: "-1px" }}>Hotel Tamaverse</h1>
       <p className="text-xl mb-14 tracking-wide" style={{ color: COLORS.subtext, animation: "fadeInUp 0.6s ease-out 0.4s both" }}>이돌라 세계 안, 어딘가에 존재하는 호텔</p>
       <div className="flex gap-5" style={{ animation: "fadeInUp 0.6s ease-out 0.6s both" }}>
         <button onClick={() => { if(window.gtag) gtag('event','hotel_checkin',{event_category:'conversion',event_label:'intro_checkin'}); dispatch({ type: ACTION.SET_PHASE, payload: "worldbuilding" }); }} className="px-12 py-4 rounded-xl text-white font-semibold text-xl tracking-wide transition-all duration-300 hover:scale-105 active:scale-95" style={{ background: "linear-gradient(135deg, #e94560, #ff6b6b)", boxShadow: "0 6px 30px rgba(233,69,96,0.4)", minWidth: 220, borderRadius: 50 }}>
@@ -1215,7 +1215,7 @@ function CastingStep4({ state, dispatch }) {
       {phase === 0 && (
         <div style={{ animation: "fadeInUp 0.6s ease-out both" }}>
           <p className="text-6xl mb-4">{draft.emoji}</p>
-          <p className="text-lg" style={{ color: COLORS.text }}>{draft.name}이(가) Hotel IDYLL에 도착했습니다...</p>
+          <p className="text-lg" style={{ color: COLORS.text }}>{draft.name}이(가) Hotel Tamaverse에 도착했습니다...</p>
           <p className="text-sm mt-2" style={{ color: COLORS.subtext }}>🏨</p>
         </div>
       )}
@@ -1262,7 +1262,7 @@ function CastingStep4({ state, dispatch }) {
         <div style={{ animation: "fadeInUp 0.6s ease-out both" }}>
           <p className="text-5xl mb-3">✨</p>
           <p className="text-lg font-bold mb-1" style={{ color: COLORS.text }}>모든 준비가 완료되었습니다!</p>
-          <p className="text-sm mb-6" style={{ color: COLORS.subtext }}>{draft.name}과(와) 5명의 투숙객이 Hotel IDYLL에서 생활을 시작합니다.</p>
+          <p className="text-sm mb-6" style={{ color: COLORS.subtext }}>{draft.name}과(와) 5명의 투숙객이 Hotel Tamaverse에서 생활을 시작합니다.</p>
           <button onClick={startSim} className="px-8 py-3.5 text-white font-bold text-lg transition-all duration-300 hover:scale-105 active:scale-95" style={{ background: "linear-gradient(135deg, #e94560, #ff6b6b)", boxShadow: "0 6px 30px rgba(233,69,96,0.4)", borderRadius: 50 }}>
             🏨 호텔 생활 시작
           </button>
@@ -1478,7 +1478,7 @@ function ContentDetailModal({ state, dispatch }) {
               <div className="flex items-center gap-2">
                 <span style={{ fontSize: 12 }}>🕰️</span>
                 <span style={{ color: COLORS.subtext, fontSize: 11, fontFamily: "'JetBrains Mono', monospace" }}>
-                  Hotel IDYLL · Day {c.day} · {mood}
+                  Hotel Tamaverse · Day {c.day} · {mood}
                 </span>
               </div>
               <span style={{ color: "rgba(233,69,96,0.5)", fontSize: 20, fontFamily: "'Playfair Display', serif" }}>✦</span>
@@ -1508,7 +1508,7 @@ function ContentDetailModal({ state, dispatch }) {
         <div className="flex items-center justify-between px-4 py-2.5" style={{ background: "rgba(78,205,196,0.06)", borderBottom: `1px solid ${COLORS.border}` }}>
           <div className="flex items-center gap-2">
             <span style={{ fontSize: 14 }}>📱</span>
-            <span style={{ color: COLORS.core, fontSize: 12, fontWeight: 800, letterSpacing: 1.5, fontFamily: "'JetBrains Mono', monospace" }}>IDYLL_GRAM</span>
+            <span style={{ color: COLORS.core, fontSize: 12, fontWeight: 800, letterSpacing: 1.5, fontFamily: "'JetBrains Mono', monospace" }}>Tamaverse_GRAM</span>
           </div>
           <span style={{ color: COLORS.subtext, fontSize: 11 }}>Day {c.day}</span>
         </div>
@@ -1588,10 +1588,10 @@ const NPC_POSITIONS = {
 };
 
 const FLOOR_META = {
-  "1F": { title: "1F — LOBBY & IDYLL BREW", locs: ["lobby", "cafe"] },
+  "1F": { title: "1F — LOBBY & Tamaverse BREW", locs: ["lobby", "cafe"] },
   "2F": { title: "2F — ROOMS", locs: ["rooms"] },
   "3F": { title: "3F — THE TABLE", locs: ["restaurant"] },
-  "4F": { title: "4F — STAGE IDYLL", locs: ["stage"] },
+  "4F": { title: "4F — STAGE Tamaverse", locs: ["stage"] },
   "5F": { title: "5F — SKYLINE", locs: ["skyline"] },
   "B1F": { title: "B1F — VENDING CORNER", locs: ["vending"] },
 };
@@ -1928,7 +1928,7 @@ function sharedSofa(d, sx, sy) {
   d.vl(sx + 5, sy + 3, 3, "#b85838"); d.vl(sx + 10, sy + 3, 3, "#b85838"); d.hl(sx, sy + 7, 16, "#6b3018");
 }
 
-// ═══════ 1F: LOBBY & IDYLL BREW (HD) ═══════
+// ═══════ 1F: LOBBY & Tamaverse BREW (HD) ═══════
 function drawFloor1F(ctx) {
   const d = D(ctx);
   d.r(0, 0, GW, GH, "#0e0a06");
@@ -2118,7 +2118,7 @@ function drawFloor3F(ctx) {
   d.r(30, 80, 50, 6, "#a03020"); d.r(31, 81, 48, 4, "#b83828");
 }
 
-// ═══════ 4F: STAGE IDYLL (Performance hall) ═══════
+// ═══════ 4F: STAGE Tamaverse (Performance hall) ═══════
 function drawFloor4F(ctx) {
   const d = D(ctx);
   d.r(0, 0, GW, GH, "#1a120b");
@@ -2966,7 +2966,7 @@ function MapViewer({ state, dispatch }) {
   // Caster auto-cycling dialogue: rotate between live commentary and ambient lines
   const CASTER_AMBIENT = useMemo(() => [
     `${FLOOR_META[activeFloor]?.title || activeFloor}의 분위기가 정말 좋습니다! 투숙객들의 하루가 궁금하시죠?`,
-    "오늘도 Hotel IDYLL에서 새로운 이야기가 만들어지고 있습니다~",
+    "오늘도 Hotel Tamaverse에서 새로운 이야기가 만들어지고 있습니다~",
     `지금 ${FLOOR_META[activeFloor]?.title || activeFloor}에는 어떤 드라마가 펼쳐지고 있을까요?`,
     "캐스터가 실시간으로 전해드리겠습니다! 놓치지 마세요~",
     `투숙객들 사이에 미묘한 감정선이 흐르고 있는 것 같은데요...`,
@@ -3227,7 +3227,7 @@ function MapViewer({ state, dispatch }) {
 // ── MINI APP MODAL — themed single-page mini-apps ──
 const MINI_APP_CONFIGS = {
   coffee: {
-    title: "IDYLL BREW", subtitle: "오늘의 커피를 내려보세요",
+    title: "Tamaverse BREW", subtitle: "오늘의 커피를 내려보세요",
     accent: "#8B5E3C", bg: "linear-gradient(135deg, rgba(139,94,60,0.1), rgba(78,205,196,0.04))",
     steps: [
       { label: "원두 선택", options: ["🇪🇹 에티오피아 예가체프", "🇨🇴 콜롬비아 수프리모", "🇧🇷 브라질 산토스", "🇬🇹 과테말라 안티구아"] },
@@ -3328,7 +3328,7 @@ const MINI_APP_CONFIGS = {
     accent: "#E94560", bg: "linear-gradient(135deg, rgba(233,69,96,0.08), rgba(123,97,255,0.04))",
     songs: [
       { emoji: "🎵", title: "이돌의 밤", artist: "Hotel Band", difficulty: "★★" },
-      { emoji: "🎶", title: "별이 빛나는 밤에", artist: "IDYLL OST", difficulty: "★★★" },
+      { emoji: "🎶", title: "별이 빛나는 밤에", artist: "Tamaverse OST", difficulty: "★★★" },
       { emoji: "🎤", title: "안녕, 이돌", artist: "투숙객 합창단", difficulty: "★" },
     ],
     resultTexts: { perfect: "관객들의 환호가 터진다! 🎉🎊", good: "꽤 괜찮은 무대였어요 👏", miss: "다음엔 더 잘할 수 있어요 😅" },
@@ -3408,7 +3408,7 @@ const MINI_APP_CONFIGS = {
     lore: "더 테이블은 이돌의 메인 다이닝 공간입니다.\n아침·점심·저녁 식사가 제공됩니다.",
   },
   show: {
-    title: "STAGE IDYLL", subtitle: "오늘의 공연을 감상하세요",
+    title: "STAGE Tamaverse", subtitle: "오늘의 공연을 감상하세요",
     accent: "#E94560", bg: "linear-gradient(135deg, rgba(233,69,96,0.08), rgba(123,97,255,0.04))",
     shows: [
       { emoji: "🎭", name: "즉흥 연극", desc: "투숙객 참여형 연극", time: "19:00" },
@@ -4668,10 +4668,10 @@ function VersionUpModal({ state, dispatch }) {
     dispatch({ type: ACTION.VERSION_UP });
     if (nextV === "1.2" && !(state.npcs.branded || []).find(n => n.id === "luna")) {
       dispatch({ type: ACTION.ADD_BRANDED_NPC, payload: BRANDED_NPC_LUNA });
-      dispatch({ type: ACTION.ADD_FEED_ITEM, payload: { id: `f-luna-${Date.now()}`, type: "event", text: "🧥 루나(LUNA Fashion)가 Hotel IDYLL에 체크인했습니다!", time: formatGameTime(state.simulation.gameTime), day: state.simulation.gameDay } });
+      dispatch({ type: ACTION.ADD_FEED_ITEM, payload: { id: `f-luna-${Date.now()}`, type: "event", text: "🧥 루나(LUNA Fashion)가 Hotel Tamaverse에 체크인했습니다!", time: formatGameTime(state.simulation.gameTime), day: state.simulation.gameDay } });
       dispatch({ type: ACTION.ADD_EVENT_LOG, payload: { type: "special", title: "루나 입주", description: "LUNA Fashion 크리에이티브 디렉터 루나가 호텔에 입주했습니다.", day: state.simulation.gameDay, time: formatGameTime(state.simulation.gameTime), npcsInvolved: ["luna"] } });
     }
-    if (nextV === "1.1") dispatch({ type: ACTION.ADD_FEED_ITEM, payload: { id: `f-v11-${Date.now()}`, type: "event", text: "🎭 4F 공연장 'Stage IDYLL'이 오픈!", time: formatGameTime(state.simulation.gameTime), day: state.simulation.gameDay } });
+    if (nextV === "1.1") dispatch({ type: ACTION.ADD_FEED_ITEM, payload: { id: `f-v11-${Date.now()}`, type: "event", text: "🎭 4F 공연장 'Stage Tamaverse'이 오픈!", time: formatGameTime(state.simulation.gameTime), day: state.simulation.gameDay } });
     // Schedule version NPCs for staggered arrival
     const vNpcs = VERSION_NPCS[nextV];
     if (vNpcs && vNpcs.length > 0) {
@@ -4687,7 +4687,7 @@ function VersionUpModal({ state, dispatch }) {
   return (<ModalOverlay width={520} onClose={() => dispatch({ type: ACTION.CLOSE_MODAL })}><div className="rounded-2xl p-7" style={{ ...MODAL_W, background: COLORS.card, border: `2px solid ${COLORS.border}` }}>
     <p className="text-center mb-3" style={{ fontSize: 44 }}>🎉</p>
     <h3 className="font-bold text-center mb-1" style={{ color: COLORS.text, fontSize: 22 }}>{info.title}</h3>
-    <p className="text-center mb-5" style={{ color: COLORS.subtext, fontSize: 14 }}>Hotel IDYLL 업데이트</p>
+    <p className="text-center mb-5" style={{ color: COLORS.subtext, fontSize: 14 }}>Hotel Tamaverse 업데이트</p>
     <div className="space-y-2.5 mb-6">{info.features.map((f, i) => (<div key={i} className="flex items-center gap-3 px-4 py-3 rounded-xl" style={{ background: COLORS.bg, border: `1px solid ${COLORS.border}` }}><span style={{ fontSize: 24, flexShrink: 0 }}>{f.emoji}</span><p style={{ color: COLORS.text, fontSize: 15 }}>{f.text}</p></div>))}</div>
     <button onClick={handleApply} className="w-full py-3.5 rounded-xl text-white font-bold transition-all hover:scale-[1.02]" style={{ background: COLORS.accent, fontSize: 16 }}>업데이트 적용 ✨</button>
     <button onClick={() => dispatch({ type: ACTION.CLOSE_MODAL })} className="w-full py-3 rounded-lg mt-2" style={{ color: COLORS.subtext, fontSize: 14 }}>취소</button>
@@ -4710,7 +4710,7 @@ function StoryExportModal({ state, dispatch }) {
   const [selected, setSelected] = useState([]); const [preview, setPreview] = useState("");
   const opts = [{ id: "timeline", label: "📋 전체 타임라인", desc: "Day 1부터 시간순" }, { id: "npcArc", label: "👤 NPC별 아크", desc: "개인 여정" }, { id: "relationship", label: "💕 관계 스토리라인", desc: "관계 발전사" }, { id: "highlight", label: "✨ 콘텐츠 하이라이트", desc: "인기 SNS·일기 모음" }, { id: "ipExtend", label: "🎬 IP 확장 추천", desc: "TOP 3 + 포맷" }];
   const toggle = id => setSelected(p => p.includes(id) ? p.filter(x => x !== id) : [...p, id]);
-  const gen = () => { let md = `# 🏨 Hotel IDYLL 스토리북\n> ${state.simulation.gameDay}일 | v${state.currentVersion} | ${getAllNpcs(state).length}명\n---\n`;
+  const gen = () => { let md = `# 🏨 Hotel Tamaverse 스토리북\n> ${state.simulation.gameDay}일 | v${state.currentVersion} | ${getAllNpcs(state).length}명\n---\n`;
     if (selected.includes("timeline")) { md += "## 📋 타임라인\n"; state.eventLog.forEach(ev => { md += `- [D${ev.day} ${ev.time}] ${ev.title}: ${ev.description}\n`; }); md += "\n"; }
     if (selected.includes("npcArc")) { md += "## 👤 NPC 아크\n"; getAllNpcs(state).forEach(n => { md += `### ${n.emoji} ${n.name}\n`; const c = state.contents.filter(x => x.authorId === n.id); c.forEach(x => { md += `- ${x.type === "diary" ? "일기" : "SNS"} Day ${x.day}\n`; }); md += "\n"; }); }
     if (selected.includes("relationship")) { md += "## 💕 관계\n"; state.relationships.filter(r => r.history.length > 0).forEach(r => { const a = getNpc(state, r.npcA), b = getNpc(state, r.npcB); if (a && b) { md += `### ${a.name} ↔ ${b.name} (${r.score.toFixed(1)})\n`; r.history.forEach(h => { md += `- ${h.event} (${h.change >= 0 ? "+" : ""}${h.change})\n`; }); md += "\n"; } }); }
@@ -4731,7 +4731,7 @@ function StoryExportModal({ state, dispatch }) {
         });
       }
     }
-    if (selected.includes("ipExtend")) { md += "## 🎬 IP 확장 추천\n"; md += "- 웹드라마: Hotel IDYLL 시즌 1\n- 캐릭터 굿즈: 아크릴 스탠드\n- OST 앨범: IDYLL Sound Collection\n\n"; }
+    if (selected.includes("ipExtend")) { md += "## 🎬 IP 확장 추천\n"; md += "- 웹드라마: Hotel Tamaverse 시즌 1\n- 캐릭터 굿즈: 아크릴 스탠드\n- OST 앨범: Tamaverse Sound Collection\n\n"; }
     setPreview(md);
   };
   return (<ModalOverlay width={520} onClose={() => dispatch({ type: ACTION.CLOSE_MODAL })}><div className="rounded-2xl p-7" style={{ ...MODAL_W, maxHeight: "85vh", overflowY: "auto", background: COLORS.card, border: `2px solid ${COLORS.border}` }}>
@@ -4745,7 +4745,7 @@ function StoryExportModal({ state, dispatch }) {
 
 function ExternalShareModal({ state, dispatch }) {
   const item = state.ui.modalData; if (!item) return null;
-  const ch = [{ id: "tw", emoji: "🐦", name: "Twitter/X", p: `[Hotel IDYLL] ${item.text}` }, { id: "ig", emoji: "📷", name: "Instagram", p: `🏨 Hotel IDYLL\n${item.text}` }, { id: "yt", emoji: "▶️", name: "YouTube", p: item.text }];
+  const ch = [{ id: "tw", emoji: "🐦", name: "Twitter/X", p: `[Hotel Tamaverse] ${item.text}` }, { id: "ig", emoji: "📷", name: "Instagram", p: `🏨 Hotel Tamaverse\n${item.text}` }, { id: "yt", emoji: "▶️", name: "YouTube", p: item.text }];
   return (<ModalOverlay width={520} onClose={() => dispatch({ type: ACTION.CLOSE_MODAL })}><div className="rounded-2xl p-6" style={{ ...MODAL_W, background: COLORS.card, border: `2px solid ${COLORS.border}` }}>
     <h3 className="font-bold mb-4" style={{ color: COLORS.text, fontSize: 18 }}>📤 외부 송출</h3>
     <div className="space-y-2 mb-4">{ch.map(c => (<div key={c.id} className="flex items-start gap-3 px-3 py-3 rounded-xl" style={{ background: COLORS.bg, border: `1px solid ${COLORS.border}` }}><span style={{ fontSize: 22 }}>{c.emoji}</span><div className="flex-1 min-w-0"><p style={{ color: COLORS.text, fontSize: 14, fontWeight: 600 }}>{c.name}</p><p className="truncate" style={{ color: COLORS.subtext, fontSize: 12 }}>{c.p}</p></div><button onClick={() => navigator.clipboard?.writeText(c.p)} className="shrink-0 px-3 py-1.5 rounded-lg" style={{ background: COLORS.accent, color: "#fff", fontSize: 13 }}>복사</button></div>))}</div>
@@ -4761,7 +4761,7 @@ function EmptyState({ icon, title, sub }) {
 function SimHeader({ state }) {
   return (
     <header className="flex items-center justify-between px-5 shrink-0" style={{ height: 48, background: COLORS.bgElevated, borderBottom: `1px solid ${COLORS.border}` }}>
-      <div className="flex items-center gap-2"><span style={{ fontSize: 20 }}>🏨</span><span style={{ color: COLORS.text, fontWeight: 800, fontSize: 17, fontFamily: "'Playfair Display', serif", background: "linear-gradient(135deg, #e94560, #ff6b6b)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", letterSpacing: 1 }}>Hotel IDYLL</span></div>
+      <div className="flex items-center gap-2"><span style={{ fontSize: 20 }}>🏨</span><span style={{ color: COLORS.text, fontWeight: 800, fontSize: 17, fontFamily: "'Playfair Display', serif", background: "linear-gradient(135deg, #e94560, #ff6b6b)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", letterSpacing: 1 }}>Hotel Tamaverse</span></div>
       <div className="flex items-center gap-3">
         <span style={{ fontFamily: "'JetBrains Mono', monospace", fontWeight: 700, color: COLORS.accent, fontSize: 13, padding: "2px 8px", background: "rgba(233,69,96,0.12)", borderRadius: 20, border: "1px solid rgba(233,69,96,0.25)" }}>v{state.currentVersion}</span>
         {versionGte(state.currentVersion, "1.2") && <span style={{ fontFamily: "'JetBrains Mono', monospace", color: COLORS.expansion, fontWeight: 700, fontSize: 13 }}>💰 {state.credits} 샤드</span>}
@@ -4830,7 +4830,7 @@ function SimulationScreen({ state, dispatch }) {
 // 11. 루트 컴포넌트
 // ═══════════════════════════════════════════════
 
-export default function HotelIdyllApp() {
+export default function HotelTamaverseApp() {
   const [state, dispatch] = useReducer(gameReducer, INITIAL_STATE);
   return (
     <>

@@ -1,11 +1,11 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import HotelIdyllApp from "./App";
+import HotelTamaverseApp from "./App";
 import "./index.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <HotelIdyllApp />
+    <HotelTamaverseApp />
   </React.StrictMode>
 );
 
