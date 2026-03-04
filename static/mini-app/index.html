@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>오시즈 컴패니언 앱 플랫폼 시뮬레이터</title>
+<!-- GA4 -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-JM5QR63VMC"></script>
+<script>
+window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}
+gtag('js',new Date());gtag('config','G-JM5QR63VMC');
+</script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=JetBrains+Mono:wght@300;400;500;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{overflow:hidden;background:#1a1a2e;font-family:'Noto Sans KR',sans-serif;-webkit-font-smoothing:antialiased}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(78,205,196,.015) 1px,transparent 1px),linear-gradient(90deg,rgba(78,205,196,.015) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;z-index:0}
+button{font-family:inherit}
+button:focus-visible{outline:2px solid #7B61FF;outline-offset:1px}
+button:active{transform:scale(0.97)}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.12);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,0.2)}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes modalIn{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(233,69,96,.3)}70%{box-shadow:0 0 0 8px rgba(233,69,96,0)}100%{box-shadow:0 0 0 0 rgba(233,69,96,0)}}
+@keyframes bannerScroll{0%{transform:translateX(0%)}100%{transform:translateX(-50%)}}
+@keyframes springIn{0%{transform:translate(-50%,-50%) scale(0.3);opacity:0}40%{transform:translate(-50%,-50%) scale(1.15);opacity:1}70%{transform:translate(-50%,-50%) scale(0.92)}100%{transform:translate(-50%,-50%) scale(1)}}
+@keyframes panelIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+@keyframes bgRotate{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes nodeHighlight{0%{box-shadow:0 0 0 0 var(--hl-color,rgba(78,205,196,0.6));transform:scale(1)}30%{box-shadow:0 0 12px 4px var(--hl-color,rgba(78,205,196,0.4));transform:scale(1.25)}100%{box-shadow:0 0 0 0 var(--hl-color,rgba(78,205,196,0));transform:scale(1)}}
+</style>
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+var React=window.React;var ReactDOM=window.ReactDOM;
+var useState=React.useState,useReducer=React.useReducer,useEffect=React.useEffect,useRef=React.useRef,createContext=React.createContext,useContext=React.useContext,useMemo=React.useMemo,useCallback=React.useCallback;
+var CE=React.createElement;
+
+/* ══════ DESIGN TOKENS ══════ */
+var T={
+  bg:"#1a1a2e",panel:"#16213e",card:"#1c1c35",surface:"#1e2a4a",
+  t1:"#f5f5f5",t2:"#b0b8c8",t3:"#a0a0a0",
+  border:"rgba(255,255,255,0.1)",borderHover:"rgba(255,255,255,0.18)",
+  accent:"#e94560",core:"#4ecdc4",expansion:"#ff9f43",balance:"#7B61FF",
+  shadow:"0 4px 24px rgba(0,0,0,0.4)",
+  R:{sm:8,md:12,lg:20},
+  L:{L1:"#7B61FF",L2:"#4ecdc4",L3:"#e94560",L4:"#ff9f43",L5:"#ff9f43",L6:"#7B61FF",L7:"#4ecdc4"},
+  P:["#a0a0a0","#7B61FF","#4ecdc4","#7B61FF","#4ecdc4"]
+};
+var mono="'JetBrains Mono',monospace";
+/* gap/pad helpers for 125% zoom tolerance */
+var G=8;/* base gap */
+var SC=1.4;/* UI scale factor */
+var GP=function(n){return n*G;};
+
+/* ══════ DATA ══════ */
+var PH=[
+  {l:"🎮 런칭",d:0,r:[0,0],desc:"D+0"},
+  {l:"📱 축적기",d:1,r:[1,29],desc:"D+1~29"},
+  {l:"🎉 플랫폼",d:30,r:[30,89],desc:"D+30~89"},
+  {l:"🤝 파트너",d:90,r:[90,179],desc:"D+90~179"},
+  {l:"🎨 크리에이터",d:180,r:[180,240],desc:"D+180~240"}
+];
+var EV=[
+  {d:1,e:"📷",t:"포토부스 런칭",desc:"첫 번째 컴패니언 앱"},
+  {d:30,e:"🎉",t:"플랫폼 전환",desc:"30개 앱 달성"},
+  {d:45,e:"🎮",t:"시즌 1",desc:"시즌 업데이트"},
+  {d:60,e:"💎",t:"프리미엄 앱",desc:"크레딧 기반"},
+  {d:90,e:"🔗",t:"파트너 확장",desc:"인프라 개방"},
+  {d:100,e:"🎮",t:"시즌 2",desc:"대규모 연동"},
+  {d:120,e:"🛠",t:"SDK 베타",desc:"크리에이터 툴"},
+  {d:180,e:"🎨",t:"크리에이터",desc:"생태계 개방"}
+];
+var EV_DAYS=new Set(EV.map(function(e){return e.d}));
+function seededRand(seed){var s=seed;return function(){s=(s*16807+0)%2147483647;return(s-1)/2147483646;};}
+var _r=seededRand(42);
+var AN=["포토부스","비밀편지","운명의갈림길","밈메이커","이돌라타임즈","NPC캐스팅","드레스룸","이돌라법안","이돌라CCTV","이상형월드컵","관계도트래커","모먼트리퀘스트","숨은캐릭터찾기","1분팬픽","팬덤챔피언십","이돌라엽서","캐릭터셔플대화","도전퀘스트","팬아트갤러리","성격테스트","세계관퀴즈","굿즈커스텀","캐릭터요리","별자리매칭","이돌라라디오","소원트리","캐릭터대화","팬클럽","이돌라극장","캐릭터일기"];
+var AE=["📷","📬","⚔","😂","📰","🎬","👗","📜","📹","🏆","🔗","🌟","🔍","📝","🏅","💌","🎭","🎯","🎨","🧪","❓","🛍","🍳","⭐","📻","🌳","💬","👥","🎪","📖"];
+var AD=["캐릭터 사진 촬영","캐릭터에게 편지","스토리 선택지 투표","캐릭터 밈 생성","세계관 뉴스","NPC 역할 커스텀","캐릭터 코디","세계 법안 투표","세계관 카메라","이상형 투표","관계 추적","모먼트 요청","히든 캐릭터","1분 창작","팬 대회","엽서 제작","랜덤 대화","일일 퀘스트","팬아트 전시","성격 분석","세계관 퀴즈","굿즈 제작","요리 체험","별자리 매칭","캐릭터 라디오","소원 나무","캐릭터 대화","팬클럽 활동","이돌라 극장","캐릭터 일기장"];
+var AXS=["✨","💌","🗳","🎨","🔭"];
+var ALL_APPS=[];
+(function(){var day=1;for(var i=0;i<50;i++){var iv=i===0?1:Math.floor(_r()*4)+3;if(i>0)day+=iv;var ip=i>=15&&_r()>0.6;var i3=i>=25&&_r()>0.5;var cc=ip?Math.floor(_r()*3+1)*10:0;ALL_APPS.push({id:"a"+i,d:Math.min(day,235),e:AE[i%30],n:i<30?AN[i]:"앱"+(i+1),ax:AXS[i%5],desc:i<30?AD[i]:"컴패니언 앱",isPremium:ip,is3rd:i3,creditCost:cc});}})();
+var DAU_E=[[0,100],[14,80],[30,72],[45,105],[60,85],[90,72],[100,120],[180,110],[240,115]];
+var DAU_C=[[0,100],[14,75],[30,60],[45,90],[60,65],[90,55],[100,70],[180,40],[240,35]];
+var RET_E=[[0,45],[30,38],[45,42],[90,35],[100,40],[180,38],[240,36]];
+var RET_C=[[0,45],[30,30],[45,35],[90,22],[100,28],[180,15],[240,12]];
+var SOC={
+  twitter:{ic:"X",lb:"X (Twitter)",k:[[0,800],[30,1500],[60,5200],[90,9000],[120,14000],[180,28000],[240,42000]]},
+  instagram:{ic:"📸",lb:"Instagram",k:[[0,400],[30,900],[60,3100],[90,6500],[120,10000],[180,22000],[240,35000]]},
+  tiktok:{ic:"🎵",lb:"TikTok",k:[[0,200],[30,600],[60,2800],[90,4500],[120,8000],[180,18000],[240,30000]]},
+  twitch:{ic:"🎮",lb:"Twitch",k:[[0,50],[30,200],[60,800],[90,1800],[120,3000],[180,6000],[240,9000]]}
+};
+var REV_KEYS=[
+  ["mainIAP",{color:T.accent,label:"메인IAP",start:0,k:[[0,0],[30,8000],[60,7200],[90,8800],[180,9200],[240,9600]]}],
+  ["premium",{color:T.balance,label:"프리미엄",start:60,k:[[60,800],[90,1600],[120,2000],[180,2400],[240,2800]]}],
+  ["credit",{color:T.core,label:"크레딧",start:90,k:[[90,1200],[120,2000],[180,2800],[240,3200]]}],
+  ["partner",{color:"#A78BFA",label:"파트너",start:120,k:[[120,640],[180,1600],[240,2400]]}],
+  ["creator",{color:"#34D399",label:"크리에이터",start:180,k:[[180,400],[240,2000]]}]
+];
+var REV_CTL=[[0,8000],[30,7600],[60,6800],[90,6400],[120,6000],[180,5200],[240,4800]];
+var BANNERS=[
+  {minDay:0,text:"🎮 오시즈 메인 게임에서 새로운 모험이 시작됩니다!",color:T.accent},
+  {minDay:45,text:"⚔ 시즌 1 업데이트 — 새로운 스토리 공개!",color:T.balance},
+  {minDay:90,text:"🔗 파트너 개방 — 서드파티 합류!",color:T.balance},
+  {minDay:180,text:"🎨 크리에이터 생태계 개방!",color:T.core}
+];
+var PERS={
+  A:{name:"유저A",label:"소셜 발견형",emoji:"👩",color:T.expansion,tl:[{day:7,nodes:["소셜","포토부스"],count:2},{day:15,nodes:["밈메이커"],count:3},{day:30,nodes:["플랫폼","드레스룸"],count:5},{day:50,nodes:["이상형월드컵"],count:7},{day:90,nodes:["메인게임"],count:8},{day:120,nodes:["NPC캐스팅"],count:10},{day:180,nodes:["크리에이터존"],count:11}]},
+  B:{name:"유저B",label:"게임 유저",emoji:"👨",color:T.accent,tl:[{day:0,nodes:["메인게임"],count:1},{day:3,nodes:["포토부스"],count:2},{day:14,nodes:["NPC캐스팅"],count:3},{day:30,nodes:["플랫폼","운명"],count:6},{day:90,nodes:["소셜"],count:8},{day:100,nodes:["시즌2"],count:9},{day:180,nodes:["크리에이터존"],count:11}]},
+  C:{name:"유저C",label:"크리에이터",emoji:"🎨",color:T.core,tl:[{day:0,nodes:["소셜"],count:1},{day:7,nodes:["밈메이커"],count:2},{day:30,nodes:["플랫폼","팬픽"],count:5},{day:60,nodes:["NPC","모먼트"],count:7},{day:90,nodes:["메인게임"],count:9},{day:120,nodes:["SDK베타"],count:10},{day:180,nodes:["크리에이터툴"],count:12}]}
+};
+var ARROWS=[
+  {id:"ar-01",from:"L1",to:"L2",color:T.balance,minDay:30,desc:"앱 런칭 → 플랫폼에 카드 추가"},
+  {id:"ar-02",from:"L1",to:"L4",color:T.balance,minDay:1,desc:"앱 런칭 → 소셜 런칭 알림"},
+  {id:"ar-03",from:"L4",to:"L5L6",color:T.expansion,minDay:7,desc:"소셜 발견 → 고객 유입"},
+  {id:"ar-04",from:"L1",to:"L5L6",color:T.accent,minDay:30,desc:"앱 사용 → 고객 여정 진행"},
+  {id:"ar-05",from:"L5L6",to:"L1",color:T.balance,minDay:45,desc:"유저 탐색 → 신규 앱 발견"},
+  {id:"ar-06",from:"L5L6",to:"L7",color:T.core,minDay:120,desc:"생태계 → 파트너 수수료"},
+  {id:"ar-07",from:"L5L6",to:"L2",color:T.core,minDay:70,desc:"고객 활성 → 플랫폼 앱 확장"},
+  {id:"ar-08",from:"L7",to:"L1",color:T.balance,minDay:100,desc:"수익 재투자 → 신규 앱 추가"}
+];
+
+/* ══════ UTILS ══════ */
+function lerp(k,day){if(day<=k[0][0])return k[0][1];if(day>=k[k.length-1][0])return k[k.length-1][1];for(var i=0;i<k.length-1;i++){if(day>=k[i][0]&&day<=k[i+1][0]){var t=(day-k[i][0])/(k[i+1][0]-k[i][0]);return k[i][1]+t*(k[i+1][1]-k[i][1]);}}return k[0][1];}
+function fN(n){return Math.round(n).toLocaleString();}
+function gP(d){return d===0?0:d<=29?1:d<=89?2:d<=179?3:4;}
+function mkChart(eK,cK,maxDay){var r=[],step=Math.max(1,Math.floor(maxDay/25));for(var d=0;d<=maxDay;d+=step)r.push({day:d,exp:+(lerp(eK,d).toFixed(1)),ctl:+(lerp(cK,d).toFixed(1))});if(r.length&&r[r.length-1].day!==maxDay)r.push({day:maxDay,exp:+(lerp(eK,maxDay).toFixed(1)),ctl:+(lerp(cK,maxDay).toFixed(1))});return r;}
+
+/* ══════ STATE ══════ */
+var init={currentDay:0,currentPhase:0,isPlaying:false,playbackSpeed:1,selectedPersona:"A",activeModal:null,hoveredArrow:null,eventPaused:false,showConnections:false,credit:100};
+function reducer(s,a){
+  switch(a.type){
+    case "SET_DAY":var d=Math.max(0,Math.min(240,a.payload));return Object.assign({},s,{currentDay:d,currentPhase:gP(d)});
+    case "TOGGLE_PLAY":return Object.assign({},s,{isPlaying:!s.isPlaying});
+    case "SET_PLAYING":return Object.assign({},s,{isPlaying:a.payload});
+    case "SET_SPEED":return Object.assign({},s,{playbackSpeed:a.payload});
+    case "SELECT_PERSONA":return Object.assign({},s,{selectedPersona:a.payload});
+    case "OPEN_MODAL":return Object.assign({},s,{activeModal:a.payload});
+    case "CLOSE_MODAL":return Object.assign({},s,{activeModal:null});
+    case "HOVER_ARROW":return Object.assign({},s,{hoveredArrow:a.payload});
+    case "SET_EVENT_PAUSED":return Object.assign({},s,{eventPaused:a.payload});
+    case "TOGGLE_CONNECTIONS":return Object.assign({},s,{showConnections:!s.showConnections});
+    case "USE_CREDIT":return Object.assign({},s,{credit:Math.max(0,s.credit-a.payload)});
+    case "ADD_CREDIT":return Object.assign({},s,{credit:s.credit+a.payload});
+    default:return s;
+  }
+}
+var Ctx=createContext();
+function useApp(){return useContext(Ctx);}
+
+/* ══════ PANEL WRAPPER — consistent styling ══════ */
+function Panel(props){
+  var c=props.color||T.t3;var delay=props.delay||0;
+  var _hov=useState(false),hov=_hov[0],sHov=_hov[1];
+  var isClick=!!props.onClick;
+  return(
+    <div id={props.id||""} onClick={props.onClick}
+      onMouseEnter={function(){if(isClick)sHov(true);}} onMouseLeave={function(){sHov(false);}}
+      style={Object.assign({background:T.panel,border:"1px solid "+(hov?c+"35":T.border),borderRadius:T.R.md,padding:G,display:"flex",flexDirection:"column",overflow:"hidden",width:"100%",height:"100%",animation:"panelIn 0.4s ease "+delay+"s both",cursor:isClick?"pointer":"default",transition:"border-color 0.25s, box-shadow 0.25s",boxShadow:hov?"0 0 0 1px "+c+"15, 0 2px 12px rgba(0,0,0,0.2)":"none"},props.style||{})}>
+      {props.label&&<div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:5,flexShrink:0,paddingBottom:4,borderBottom:"1px solid rgba(255,255,255,0.04)"}}>
+        <div style={{display:"flex",alignItems:"center",gap:6}}>
+          <div style={{width:3,height:14,borderRadius:2,background:c}}/>
+          <span style={{color:c,fontSize:11,fontWeight:700}}>{props.label}</span>
+          {isClick&&<span style={{fontSize:8,color:T.t3,opacity:hov?1:0,transition:"opacity 0.2s",fontFamily:mono}}>{"↗ 상세"}</span>}
+        </div>
+        {props.badge&&<div>{props.badge}</div>}
+      </div>}
+      {props.children}
+    </div>
+  );
+}
+
+/* ══════ SVG LINE CHART ══════ */
+function SvgLine(props){
+  var data=props.data,lines=props.lines,legend=props.legend;
+  var _h=useState(null),hover=_h[0],setHover=_h[1];
+  if(!data||data.length<2)return CE("div",{style:{color:T.t3,fontSize:11,textAlign:"center",padding:8}},"데이터 없음");
+  var W=360,H=160,pad={t:legend?28:10,r:10,b:24,l:42},cw=W-pad.l-pad.r,ch=H-pad.t-pad.b;
+  var xMin=data[0].day,xMax=data[data.length-1].day||1,yMin=Infinity,yMax=-Infinity;
+  lines.forEach(function(ln){data.forEach(function(d){var v=d[ln.dataKey];if(v!=null){yMin=Math.min(yMin,v);yMax=Math.max(yMax,v);}});});
+  if(yMin===yMax){yMin-=1;yMax+=1;}var yP=(yMax-yMin)*0.1;yMin=Math.max(0,yMin-yP);yMax+=yP;
+  var sx=function(d){return pad.l+((d-xMin)/(xMax-xMin||1))*cw;};
+  var sy=function(v){return pad.t+(1-(v-yMin)/(yMax-yMin||1))*ch;};
+  var yTicks=[];for(var i=0;i<=3;i++)yTicks.push(yMin+(yMax-yMin)/3*i);
+  var ni=null;
+  if(hover!==null){var best=0,bd=Infinity;data.forEach(function(d,i){var dx=Math.abs(sx(d.day)-hover);if(dx<bd){bd=dx;best=i;}});ni=best;}
+  return(
+    <svg width="100%" height="100%" viewBox={"0 0 "+W+" "+H} preserveAspectRatio="xMidYMid meet"
+      onMouseMove={function(e){var r=e.currentTarget.getBoundingClientRect();setHover((e.clientX-r.left)/r.width*W);}}
+      onMouseLeave={function(){setHover(null);}} style={{display:"block"}}>
+      {legend&&<g>{lines.map(function(ln,i){return <g key={i}><line x1={pad.l+i*100} y1={7} x2={pad.l+i*100+14} y2={7} stroke={ln.color} strokeWidth={2} strokeDasharray={ln.dash||"none"}/><text x={pad.l+i*100+18} y={10} fill={T.t2} fontSize={11} fontFamily={mono}>{ln.name}</text></g>;})}</g>}
+      {yTicks.map(function(v,i){return <g key={i}><text x={pad.l-5} y={sy(v)} fill={T.t3} fontSize={10} fontFamily={mono} textAnchor="end" dominantBaseline="middle">{v>=1000?Math.round(v/1000)+"K":Math.round(v)}</text><line x1={pad.l} y1={sy(v)} x2={pad.l+cw} y2={sy(v)} stroke="rgba(255,255,255,0.05)" strokeWidth={0.5}/></g>;})}
+      {[0,Math.round(xMax/2),xMax].map(function(d,i){return <text key={i} x={sx(d)} y={H-3} fill={T.t3} fontSize={10} fontFamily={mono} textAnchor="middle">{"D"+d}</text>;})}
+      {lines.map(function(ln,i){var path=data.filter(function(d){return d[ln.dataKey]!=null;}).map(function(d,j){return(j===0?"M":"L")+sx(d.day).toFixed(1)+","+sy(d[ln.dataKey]).toFixed(1);}).join("");return <path key={i} d={path} fill="none" stroke={ln.color} strokeWidth={ln.strokeWidth||1.5} strokeDasharray={ln.dash||"none"} strokeLinecap="round"/>;})}
+      {ni!==null&&<g>
+        <line x1={sx(data[ni].day)} y1={pad.t} x2={sx(data[ni].day)} y2={pad.t+ch} stroke={T.t3} strokeWidth={0.5} strokeDasharray="3 3"/>
+        {lines.map(function(ln,i){var v=data[ni][ln.dataKey];return v!=null?<g key={i}><circle cx={sx(data[ni].day)} cy={sy(v)} r={3.5} fill={ln.color} stroke={T.bg} strokeWidth={1.5}/><rect x={sx(data[ni].day)-16} y={sy(v)-16} width={32} height={14} rx={4} fill={T.bg+"e0"}/><text x={sx(data[ni].day)} y={sy(v)-7} fill={ln.color} fontSize={8} fontFamily={mono} textAnchor="middle" fontWeight="700">{Math.round(v)}</text></g>:null;})}
+      </g>}
+    </svg>
+  );
+}
+
+/* ══════ SVG STACKED AREA ══════ */
+function SvgStacked(props){
+  var data=props.data,keys=props.keys;
+  if(!data||data.length<2)return CE("div",{style:{color:T.t3,fontSize:11,textAlign:"center",padding:8}},"데이터 수집 중...");
+  var W=320,H=130,pad={t:6,r:8,b:22,l:38},cw=W-pad.l-pad.r,ch=H-pad.t-pad.b;
+  var xMin=data[0].day,xMax=data[data.length-1].day||1,yMax=0;
+  data.forEach(function(d){var sum=0;keys.forEach(function(k){sum+=(d[k[0]]||0);});yMax=Math.max(yMax,sum,d.ctl||0);});
+  yMax=Math.max(yMax*1.15,10);
+  var sx=function(d){return pad.l+((d-xMin)/(xMax-xMin||1))*cw;};
+  var sy=function(v){return pad.t+(1-v/(yMax||1))*ch;};
+  var cumArr=data.map(function(){return 0;});var areas=[];
+  keys.forEach(function(kc){var k=kc[0],c=kc[1];var pts=data.map(function(d,i){var prev=cumArr[i];var cur=prev+(d[k]||0);cumArr[i]=cur;return{x:sx(d.day),y0:sy(prev),y1:sy(cur)};});var path="M"+pts[0].x.toFixed(1)+","+pts[0].y1.toFixed(1);for(var i=1;i<pts.length;i++)path+="L"+pts[i].x.toFixed(1)+","+pts[i].y1.toFixed(1);for(var i=pts.length-1;i>=0;i--)path+="L"+pts[i].x.toFixed(1)+","+pts[i].y0.toFixed(1);path+="Z";areas.push({path:path,color:c.color});});
+  var ctlPath=data.map(function(d,i){return(i===0?"M":"L")+sx(d.day).toFixed(1)+","+sy(d.ctl||0).toFixed(1);}).join("");
+  var yTicks=[];for(var i=0;i<=3;i++)yTicks.push(Math.round(yMax/3*i));
+  return(
+    <svg width="100%" height="100%" viewBox={"0 0 "+W+" "+H} preserveAspectRatio="xMidYMid meet" style={{display:"block"}}>
+      {yTicks.map(function(v,i){return <g key={i}><text x={pad.l-4} y={sy(v)} fill={T.t3} fontSize={10} fontFamily={mono} textAnchor="end" dominantBaseline="middle">{v}</text><line x1={pad.l} y1={sy(v)} x2={pad.l+cw} y2={sy(v)} stroke="rgba(255,255,255,0.05)" strokeWidth={0.5}/></g>;})}
+      <line x1={pad.l} y1={pad.t+ch} x2={pad.l+cw} y2={pad.t+ch} stroke={T.border} strokeWidth={0.5}/>
+      {[xMin,Math.round((xMin+xMax)/2),xMax].map(function(d,i){return <text key={i} x={sx(d)} y={H-3} fill={T.t3} fontSize={10} fontFamily={mono} textAnchor="middle">{"D"+d}</text>;})}
+      {areas.map(function(a,i){return <path key={i} d={a.path} fill={a.color} fillOpacity={0.4} stroke={a.color} strokeWidth={0.8}/>;})}
+      <path d={ctlPath} fill="none" stroke={T.t3} strokeWidth={1.2} strokeDasharray="4 3"/>
+    </svg>
+  );
+}
+
+/* ══════ HEADER — compact for 125% ══════ */
+function EvM(props){
+  var ev=props.ev;var _h=useState(false),h=_h[0],sH=_h[1];var s=useApp().state;var past=s.currentDay>=ev.d;
+  return(
+    <div onMouseEnter={function(){sH(true);}} onMouseLeave={function(){sH(false);}} style={{position:"absolute",left:(ev.d/240*100)+"%",top:0,transform:"translateX(-50%)"+(h?" scale(1.15)":""),cursor:"pointer",fontSize:12,lineHeight:1,zIndex:h?20:1,transition:"transform 0.2s cubic-bezier(0.4,0,0.2,1)",filter:past?"none":"grayscale(0.7) opacity(0.4)"}}>
+      {ev.e}
+      {h&&<div style={{position:"absolute",top:18,left:"50%",transform:"translateX(-50%)",background:T.surface,border:"1px solid "+T.borderHover,borderRadius:T.R.sm,padding:"6px 10px",width:160,boxShadow:T.shadow,zIndex:30,backdropFilter:"blur(16px)"}}>
+        <div style={{color:T.t1,fontSize:10,fontWeight:600,fontFamily:mono}}>{"D+"+ev.d+" "+ev.t}</div>
+        <div style={{color:T.t2,fontSize:8,marginTop:2}}>{ev.desc}</div>
+      </div>}
+    </div>
+  );
+}
+function TSlider(){
+  var ctx=useApp(),s=ctx.state,d=ctx.dispatch;
+  var ref=useRef(null),dr=useRef(false),wp=useRef(false);var pos=(s.currentDay/240)*100;
+  return(
+    <div style={{position:"relative",width:"100%",padding:"16px 0 0"}}>
+      <div style={{position:"absolute",top:0,left:0,right:0,height:16}}>{EV.map(function(ev){return <EvM key={ev.d} ev={ev}/>;})}</div>
+      <div ref={ref}
+        onPointerDown={function(e){dr.current=true;wp.current=s.isPlaying;if(s.isPlaying)d({type:"SET_PLAYING",payload:false});if(ref.current){var r=ref.current.getBoundingClientRect();d({type:"SET_DAY",payload:Math.round(Math.max(0,Math.min(e.clientX-r.left,r.width))/r.width*240)});}e.currentTarget.setPointerCapture(e.pointerId);}}
+        onPointerMove={function(e){if(dr.current&&ref.current){var r=ref.current.getBoundingClientRect();d({type:"SET_DAY",payload:Math.round(Math.max(0,Math.min(e.clientX-r.left,r.width))/r.width*240)});}}}
+        onPointerUp={function(){dr.current=false;if(wp.current)d({type:"SET_PLAYING",payload:true});}}
+        style={{position:"relative",height:5,borderRadius:3,background:"rgba(255,255,255,0.06)",cursor:"pointer"}}>
+        {PH.map(function(p,i){return <div key={i} style={{position:"absolute",top:0,left:(p.r[0]/240*100)+"%",width:((p.r[1]-p.r[0]+1)/240*100)+"%",height:"100%",background:T.P[i],opacity:0.25,borderRadius:i===0?"3px 0 0 3px":i===4?"0 3px 3px 0":"0"}}/>;})}
+        <div style={{position:"absolute",top:0,left:0,width:pos+"%",height:"100%",background:T.P[s.currentPhase],borderRadius:3,opacity:0.7}}/>
+        <div style={{position:"absolute",top:"50%",left:pos+"%",transform:"translate(-50%,-50%)",width:13,height:13,borderRadius:"50%",background:T.P[s.currentPhase],border:"2px solid #fff",boxShadow:"0 0 8px "+T.P[s.currentPhase]+"80",pointerEvents:"none",zIndex:2}}/>
+      </div>
+    </div>
+  );
+}
+function Header(){
+  var ctx=useApp(),s=ctx.state;
+  return(
+    <div style={{padding:"10px 16px 6px",background:"linear-gradient(180deg,"+T.bg+","+T.panel+")",borderBottom:"1px solid "+T.border,flexShrink:0,position:"relative",zIndex:1}}>
+      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:4}}>
+        <div style={{display:"flex",alignItems:"center",gap:8}}>
+          <span style={{fontFamily:"'Playfair Display',serif",fontSize:16,fontWeight:700,background:"linear-gradient(135deg,"+T.accent+",#ff6b6b)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>OSHIZ</span>
+          <span style={{padding:"1px 6px",background:"rgba(233,69,96,0.12)",border:"1px solid rgba(233,69,96,0.25)",borderRadius:10,fontFamily:mono,fontSize:8,fontWeight:600,letterSpacing:"1px",color:T.accent}}>MINI APP STORE</span>
+        </div>
+      </div>
+      <TSlider/>
+    </div>
+  );
+}
+
+/* ══════ CTRL PANEL — widened, horizontal layout ══════ */
+function CtrlPanel(){
+  var ctx=useApp(),s=ctx.state,d=ctx.dispatch;
+  var pc=T.P[s.currentPhase];
+  var phNames=["런칭","축적기","플랫폼","파트너","크리에이터"];
+  return(
+    <Panel id="panel-ctrl" color={T.accent} label={"🎛 컨트롤러"} delay={0.1} style={{padding:10}}>
+      {/* D+ indicator — moved here from header */}
+      <div style={{display:"flex",alignItems:"center",justifyContent:"center",marginBottom:8,padding:"5px 8px",borderRadius:T.R.sm,background:pc+"10",border:"1px solid "+pc+"25",gap:5}}>
+        {s.isPlaying&&<div style={{width:5,height:5,borderRadius:"50%",background:T.accent,animation:"pulse 1.5s ease infinite",flexShrink:0}}/>}
+        <span style={{fontFamily:mono,color:pc,fontSize:11,fontWeight:700}}>{"D+"+s.currentDay}</span>
+        <span style={{color:T.t3,fontSize:8}}>{"— "+phNames[s.currentPhase]}</span>
+      </div>
+      {/* Phase Row */}
+      <div style={{marginBottom:8}}>
+        <div style={{fontSize:8,color:T.t3,fontWeight:600,textTransform:"uppercase",letterSpacing:0.8,marginBottom:4,fontFamily:mono}}>{"PHASE"}</div>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(5,1fr)",gap:3}}>
+          {PH.map(function(p,i){var a=s.currentPhase===i;return <button key={i} onClick={function(){d({type:"SET_DAY",payload:p.d});}} style={{padding:"5px 2px",borderRadius:5,border:"1px solid "+(a?T.P[i]+"60":T.border),background:a?T.P[i]+"18":"transparent",color:a?T.P[i]:T.t3,fontSize:8,cursor:"pointer",textAlign:"center",lineHeight:1.2,transition:"all 0.2s",fontWeight:a?700:400}}>
+            <div>{p.l.split(" ")[0]}</div>
+            <div style={{fontSize:8,marginTop:1}}>{p.l.split(" ")[1]||""}</div>
+          </button>;})}
+        </div>
+      </div>
+      {/* Playback + Speed */}
+      <div style={{marginBottom:8}}>
+        <div style={{fontSize:8,color:T.t3,fontWeight:600,textTransform:"uppercase",letterSpacing:0.8,marginBottom:4,fontFamily:mono}}>{"PLAYBACK"}</div>
+        <div style={{display:"flex",alignItems:"center",gap:3}}>
+          <button onClick={function(){d({type:"TOGGLE_PLAY"});}} style={{width:28,height:28,borderRadius:T.R.sm,border:"1px solid "+(s.isPlaying?pc+"60":T.border),background:s.isPlaying?pc+"25":"rgba(255,255,255,0.03)",color:s.isPlaying?pc:T.t1,fontSize:12,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,transition:"all 0.2s",animation:s.isPlaying?"pulse 2s ease infinite":"none"}}>{s.isPlaying?"⏸":"▶"}</button>
+          <div style={{display:"flex",gap:2,flex:1}}>
+            {[1,2,4,10].map(function(sp){return <button key={sp} onClick={function(){d({type:"SET_SPEED",payload:sp});}} style={{flex:1,padding:"5px 0",borderRadius:5,border:"1px solid "+(s.playbackSpeed===sp?pc+"60":T.border),background:s.playbackSpeed===sp?pc+"18":"rgba(255,255,255,0.03)",color:s.playbackSpeed===sp?pc:T.t3,fontSize:8,fontWeight:700,cursor:"pointer",fontFamily:mono,transition:"all 0.2s"}}>{sp+"×"}</button>;})}
+          </div>
+          <button onClick={function(){d({type:"SET_PLAYING",payload:false});d({type:"SET_DAY",payload:0});}} style={{width:28,height:28,borderRadius:T.R.sm,border:"1px solid "+T.border,background:"rgba(255,255,255,0.03)",color:T.t3,fontSize:11,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,transition:"all 0.2s"}} title="리플레이">{"↺"}</button>
+        </div>
+      </div>
+      {/* View Mode */}
+      <div style={{marginBottom:6}}>
+        <button onClick={function(){d({type:"TOGGLE_CONNECTIONS"});}} style={{width:"100%",padding:"7px 8px",borderRadius:T.R.sm,border:"1px solid "+(s.showConnections?T.balance+"60":T.border),background:s.showConnections?T.balance+"15":"rgba(255,255,255,0.03)",color:s.showConnections?T.balance:T.t3,fontSize:8,cursor:"pointer",fontWeight:600,textAlign:"center",transition:"all 0.2s",lineHeight:1.3}}>
+          {s.showConnections?"🔗 이벤트 상관 관계 ON":"🔗 이벤트 상관 관계"}
+        </button>
+      </div>
+    </Panel>
+  );
+}
+
+/* ══════ L1: 런칭된 앱 ══════ */
+function L1(){
+  var ctx=useApp(),s=ctx.state,d=ctx.dispatch;
+  var ac=useMemo(function(){return ALL_APPS.filter(function(x){return x.d<=s.currentDay;});},[s.currentDay]);
+  return(
+    <Panel id="panel-L1" color={T.L.L1} label={"📱 런칭된 앱"} delay={0.05}
+      badge={<span style={{fontFamily:mono,color:T.t2,fontSize:10,fontWeight:500}}>{ac.length+"/"+ALL_APPS.length}</span>}>
+      <div style={{flex:1,overflow:"auto",overflowX:"hidden",minHeight:0}}>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(8,1fr)",gap:2,alignContent:"start"}}>
+          {ALL_APPS.map(function(app){var on=app.d<=s.currentDay;return <div key={app.id}
+            onClick={function(e){if(on){e.stopPropagation();d({type:"OPEN_MODAL",payload:{type:"app",data:app}});}}}
+            style={{borderRadius:4,border:"1px solid "+(on?"rgba(255,255,255,0.06)":"transparent"),background:on?T.card:"transparent",display:"flex",alignItems:"center",justifyContent:"center",aspectRatio:"1",cursor:on?"pointer":"default",opacity:on?1:0.1,padding:1}}>
+            {on?<div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:0}}><span style={{fontSize:16,lineHeight:1}}>{app.e}</span><span style={{fontSize:8,color:T.t2,fontWeight:500,textAlign:"center",lineHeight:1.1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",maxWidth:"100%"}}>{app.n}</span></div>:<span style={{fontSize:8,color:"rgba(255,255,255,0.04)"}}>{"·"}</span>}
+          </div>;})}
+        </div>
+      </div>
+    </Panel>
+  );
+}
+
+/* ══════ L2: 앱 플랫폼 — Marketplace Style ══════ */
+function L2(){
+  var ctx=useApp(),s=ctx.state,d=ctx.dispatch;
+  var apps=useMemo(function(){return ALL_APPS.filter(function(x){return x.d<=s.currentDay;});},[s.currentDay]);
+  var launched=apps.length>=15;
+  var _c=useState("전체"),cat=_c[0],sCat=_c[1];
+  var fl=cat==="전체"?apps:apps.filter(function(x){return x.ax===cat;});
+  var activeBanners=useMemo(function(){return BANNERS.filter(function(bn){return s.currentDay>=bn.minDay;});},[s.currentDay]);
+  var bannerColor=activeBanners.length>0?activeBanners[activeBanners.length-1].color:T.accent;
+  var featured=apps.length>0?apps[apps.length-1]:null;
+  var popular=useMemo(function(){return apps.slice(0).sort(function(a,b){return a.d-b.d;}).slice(0,8);},[apps]);
+  var recent=useMemo(function(){return apps.slice(-4).reverse();},[apps]);
+  return(
+    <div id="panel-L2" style={{background:T.panel,border:"1px solid "+T.border,borderRadius:T.R.md,display:"flex",flexDirection:"column",overflow:"hidden",width:"100%",height:"100%",animation:"panelIn 0.4s ease both"}}>
+      {/* Header bar — store style, FIXED */}
+      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"6px 12px",borderBottom:"1px solid "+T.border,flexShrink:0,background:"linear-gradient(180deg,"+T.panel+","+T.bg+")"}}>
+        <div style={{display:"flex",alignItems:"center",gap:6}}>
+          <div style={{width:3,height:16,borderRadius:2,background:T.L.L2}}/><span style={{color:T.L.L2,fontSize:13,fontWeight:700}}>{"📱 OSHIZ 앱 스토어"}</span>
+          <span style={{fontFamily:mono,fontSize:9,color:T.t3,padding:"2px 7px",borderRadius:8,background:"rgba(255,255,255,0.04)"}}>{apps.length+" apps"}</span>
+        </div>
+        {launched&&<div style={{display:"flex",alignItems:"center",gap:5}}>
+          <div style={{display:"flex",alignItems:"center",gap:3,padding:"3px 8px",borderRadius:6,background:T.expansion+"0A",border:"1px solid "+T.expansion+"20"}}>
+            <span style={{fontSize:10}}>{"💰"}</span><span style={{fontFamily:mono,fontSize:11,color:T.expansion,fontWeight:700}}>{s.credit}</span>
+          </div>
+          <button onClick={function(e){e.stopPropagation();d({type:"ADD_CREDIT",payload:50});}} style={{padding:"3px 8px",borderRadius:5,border:"1px solid "+T.core+"30",background:T.core+"0A",color:T.core,fontSize:9,cursor:"pointer",fontWeight:600,fontFamily:mono}}>{"충전"}</button>
+        </div>}
+      </div>
+      {/* Category Pills — FIXED below header */}
+      {launched&&<div style={{display:"flex",gap:3,padding:"5px 10px",flexShrink:0,borderBottom:"1px solid rgba(255,255,255,0.04)",background:T.bg}}>
+        {["전체"].concat(AXS).map(function(c){return <button key={c} onClick={function(e){e.stopPropagation();sCat(c);}} style={{padding:"4px 10px",borderRadius:10,fontSize:9,border:"1px solid "+(cat===c?T.core+"30":"transparent"),background:cat===c?T.core+"10":"transparent",color:cat===c?T.core:T.t3,cursor:"pointer",fontWeight:cat===c?700:400,transition:"all 0.2s"}}>{c}</button>;})}
+      </div>}
+      {/* SINGLE SCROLL AREA — all content */}
+      <div style={{flex:1,overflow:"auto",minHeight:0,background:T.bg}}>
+        {!launched?(
+          <div style={{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:10,padding:24,minHeight:"100%"}}>
+            <div style={{fontSize:36,marginBottom:4}}>{"🏗"}</div>
+            <div style={{color:T.t1,fontSize:15,fontWeight:700}}>앱 스토어 준비 중</div>
+            <div style={{color:T.t2,fontSize:10,textAlign:"center",lineHeight:1.6}}>{"컴패니언 앱 "+apps.length+"개 / 15개 달성 시\n마켓플레이스가 오픈됩니다"}</div>
+            <div style={{width:"70%",height:8,background:"rgba(255,255,255,0.06)",borderRadius:4,overflow:"hidden",marginTop:6}}><div style={{width:Math.min(100,apps.length/15*100)+"%",height:"100%",background:"linear-gradient(90deg,#2a8f87,"+T.core+")",borderRadius:4,transition:"width 0.3s"}}/></div>
+            <div style={{fontFamily:mono,color:T.core,fontSize:18,fontWeight:700}}>{Math.round(apps.length/15*100)+"%"}</div>
+          </div>
+        ):(
+          <div style={{display:"flex",flexDirection:"column",gap:0}}>
+            {/* Banner — continuous multi-message ticker */}
+            <div style={{padding:"4px 0",background:"linear-gradient(90deg,"+bannerColor+"08,"+bannerColor+"04)",overflow:"hidden",whiteSpace:"nowrap",borderBottom:"1px solid "+T.border}}>
+              <div style={{display:"inline-block",animation:"bannerScroll "+(activeBanners.length*12)+"s linear infinite"}}>
+                {[0,1].map(function(rep){return <span key={rep}>{activeBanners.map(function(bn,i){return <span key={i+"-"+rep} style={{fontSize:9,color:bn.color,fontWeight:500,marginRight:60}}>{bn.text}</span>;})}</span>;})}
+              </div>
+            </div>
+
+            {/* Featured Hero Card — large */}
+            {featured&&<div style={{margin:"8px 10px",padding:"12px 14px",borderRadius:T.R.md,background:"linear-gradient(135deg,"+T.core+"0C,"+T.balance+"08)",border:"1px solid "+T.core+"25",cursor:"pointer",transition:"border-color 0.2s"}} onClick={function(e){e.stopPropagation();d({type:"OPEN_MODAL",payload:{type:"app",data:featured}});}}>
+              <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:6}}>
+                <span style={{fontSize:9,color:T.core,fontFamily:mono,fontWeight:700,letterSpacing:"1.5px"}}>{"✦ NEW RELEASE"}</span>
+                <span style={{fontSize:9,color:T.t3,fontFamily:mono}}>{"D+"+featured.d}</span>
+              </div>
+              <div style={{display:"flex",alignItems:"center",gap:10}}>
+                <div style={{width:44,height:44,borderRadius:10,background:"linear-gradient(135deg,"+T.card+","+T.surface+")",border:"1px solid "+T.borderHover,display:"flex",alignItems:"center",justifyContent:"center",fontSize:24,flexShrink:0}}>{featured.e}</div>
+                <div style={{flex:1,minWidth:0}}>
+                  <div style={{fontSize:13,color:T.t1,fontWeight:700,lineHeight:1.3}}>{featured.n}</div>
+                  <div style={{fontSize:9,color:T.t2,lineHeight:1.5,marginTop:3}}>{featured.desc}</div>
+                  <div style={{display:"flex",gap:4,marginTop:4}}>
+                    {featured.isPremium&&<span style={{fontSize:8,color:T.expansion,fontFamily:mono,padding:"2px 6px",borderRadius:4,background:T.expansion+"10",fontWeight:700}}>{"💎 PRO"}</span>}
+                    {featured.is3rd&&<span style={{fontSize:8,color:T.balance,fontFamily:mono,padding:"2px 6px",borderRadius:4,background:T.balance+"10",fontWeight:700}}>{"🔧 3RD"}</span>}
+                    <span style={{fontSize:8,color:T.core,fontFamily:mono,padding:"2px 6px",borderRadius:4,background:T.core+"10",fontWeight:600}}>{featured.creditCost>0?featured.creditCost+"C":"무료"}</span>
+                  </div>
+                </div>
+              </div>
+            </div>}
+
+            {/* 🔥 인기 앱 — Grid Cards */}
+            {popular.length>0&&<div style={{padding:"6px 10px 8px"}}>
+              <div style={{fontSize:10,color:T.t1,fontWeight:700,marginBottom:6}}>{"🔥 인기 앱"}</div>
+              <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:5}}>
+                {popular.slice(0,8).map(function(p){var stars=Math.min(5,Math.max(3,Math.round(4.2+((p.id.charCodeAt(1)||0)%10-5)*0.15)));return <div key={p.id} onClick={function(e){e.stopPropagation();d({type:"OPEN_MODAL",payload:{type:"app",data:p}});}} style={{padding:"6px 4px",borderRadius:T.R.sm,background:T.card,border:"1px solid "+T.border,cursor:"pointer",textAlign:"center",transition:"border-color 0.2s"}}>
+                  <div style={{fontSize:24,marginBottom:3}}>{p.e}</div>
+                  <div style={{fontSize:9,color:T.t1,fontWeight:600,lineHeight:1.2}}>{p.n}</div>
+                  <div style={{fontSize:8,color:"#ffc107",marginTop:2,letterSpacing:-1}}>{"★".repeat(stars)}</div>
+                  <div style={{fontFamily:mono,fontSize:8,color:p.creditCost>0?T.expansion:T.core,marginTop:2,fontWeight:600}}>{p.creditCost>0?p.creditCost+"C":"무료"}</div>
+                </div>;})}
+              </div>
+            </div>}
+
+            {/* 🆕 최근 출시 — Horizontal cards */}
+            {recent.length>0&&<div style={{padding:"4px 10px 8px",borderTop:"1px solid rgba(255,255,255,0.04)"}}>
+              <div style={{fontSize:10,color:T.t1,fontWeight:700,marginBottom:6}}>{"🆕 최근 출시"}</div>
+              <div style={{display:"flex",gap:5}}>
+                {recent.map(function(r){return <div key={r.id} onClick={function(e){e.stopPropagation();d({type:"OPEN_MODAL",payload:{type:"app",data:r}});}} style={{flex:1,display:"flex",alignItems:"center",gap:6,padding:"6px 8px",borderRadius:T.R.sm,background:T.card,border:"1px solid "+T.border,cursor:"pointer",transition:"border-color 0.2s"}}>
+                  <div style={{width:28,height:28,borderRadius:7,background:"linear-gradient(135deg,"+T.card+","+T.surface+")",border:"1px solid rgba(255,255,255,0.06)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:15,flexShrink:0}}>{r.e}</div>
+                  <div style={{flex:1,minWidth:0}}>
+                    <div style={{fontSize:9,color:T.t1,fontWeight:600}}>{r.n}</div>
+                    <div style={{fontFamily:mono,fontSize:8,color:T.t3}}>{"D+"+r.d}</div>
+                  </div>
+                </div>;})}
+              </div>
+            </div>}
+
+            {/* 📋 전체 목록 — Section header + list */}
+            <div style={{padding:"4px 10px 2px",borderTop:"1px solid rgba(255,255,255,0.04)"}}>
+              <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:4}}>
+                <span style={{fontSize:10,color:T.t1,fontWeight:700}}>{"📋 "+(cat==="전체"?"전체 앱":cat)}</span>
+                <span style={{fontFamily:mono,fontSize:9,color:T.t3}}>{fl.length+"개"}</span>
+              </div>
+            </div>
+            <div style={{display:"flex",flexDirection:"column",gap:1,padding:"0 8px 12px"}}>
+              {fl.map(function(x,idx){
+                var stars=Math.min(5,Math.max(3,Math.round(4.2+((x.id.charCodeAt(1)||0)%10-5)*0.15)));
+                return <div key={x.id} onClick={function(e){e.stopPropagation();d({type:"OPEN_MODAL",payload:{type:"app",data:x}});}}
+                style={{display:"flex",alignItems:"center",gap:8,padding:"6px 8px",borderRadius:8,background:"transparent",cursor:"pointer",transition:"background 0.15s",borderBottom:"1px solid rgba(255,255,255,0.03)"}}>
+                <span style={{fontFamily:mono,fontSize:9,color:T.t3,width:18,textAlign:"right",flexShrink:0}}>{idx+1}</span>
+                <div style={{width:32,height:32,borderRadius:8,background:"linear-gradient(135deg,"+T.card+","+T.surface+")",border:"1px solid rgba(255,255,255,0.06)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:17,flexShrink:0}}>{x.e}</div>
+                <div style={{flex:1,minWidth:0,overflow:"hidden"}}>
+                  <div style={{display:"flex",alignItems:"center",gap:4}}>
+                    <span style={{fontSize:10,color:T.t1,fontWeight:600}}>{x.n}</span>
+                    {x.isPremium&&<span style={{fontSize:8,color:T.expansion,fontFamily:mono,padding:"1px 5px",borderRadius:3,background:T.expansion+"10",lineHeight:"13px",fontWeight:700}}>{"PRO"}</span>}
+                    {x.is3rd&&<span style={{fontSize:8,color:T.balance,fontFamily:mono,padding:"1px 5px",borderRadius:3,background:T.balance+"10",lineHeight:"13px",fontWeight:700}}>{"3RD"}</span>}
+                  </div>
+                  <div style={{fontSize:8,color:T.t3,lineHeight:1.4,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{x.desc}</div>
+                </div>
+                <div style={{display:"flex",flexDirection:"column",alignItems:"flex-end",flexShrink:0,gap:2}}>
+                  <div style={{fontSize:9,color:"#ffc107",letterSpacing:-1}}>{"★".repeat(stars)+"☆".repeat(5-stars)}</div>
+                  <div style={{fontFamily:mono,fontSize:9,color:x.creditCost>0?T.expansion:T.core,fontWeight:600}}>{x.creditCost>0?x.creditCost+"C":"무료"}</div>
+                </div>
+              </div>;})}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ══════ L4: 소셜 채널 ══════ */
+function L4(){
+  var ctx=useApp(),s=ctx.state,d=ctx.dispatch;
+  var chs=Object.entries(SOC).map(function(entry){var k=entry[0],v=entry[1];return{k:k,ic:v.ic,lb:v.lb,val:Math.round(lerp(v.k,s.currentDay))};});
+  var tot=chs.reduce(function(sum,c){return sum+c.val;},0);
+  return(
+    <Panel id="panel-L4" color={T.L.L4} label={"📱 소셜 채널"} delay={0.2}
+      badge={<span style={{fontFamily:mono,color:T.t2,fontSize:10}}>{"총 "+fN(tot)}</span>}
+      onClick={function(){d({type:"OPEN_MODAL",payload:{type:"L4"}});}}>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:4,flex:1,alignContent:"center"}}>
+        {chs.map(function(c){return <div key={c.k} style={{display:"flex",alignItems:"center",gap:6,padding:"5px 8px",borderRadius:6,background:T.card,border:"1px solid "+T.border}}>
+          <div style={{width:24,height:24,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:14,borderRadius:4,background:"rgba(255,255,255,0.04)"}}>{c.ic}</div>
+          <div style={{flex:1,minWidth:0}}>
+            <div style={{fontFamily:mono,fontSize:11,fontWeight:700,color:T.t1}}>{fN(c.val)}</div>
+            <div style={{fontSize:8,color:T.t3}}>{c.lb}</div>
+          </div>
+        </div>;})}
+      </div>
+    </Panel>
+  );
+}
+
+/* ══════ L5L6: 고객 여정 / 생태계 확장 — 통합 패널 ══════ */
+function L5L6(){
+  var ctx=useApp(),s=ctx.state,d=ctx.dispatch;
+  var pe=PERS[s.selectedPersona||"A"];
+  var ct=useMemo(function(){var c=0;pe.tl.forEach(function(t){if(t.day<=s.currentDay)c=t.count;});return c;},[s.currentDay,s.selectedPersona]);
+  var an=useMemo(function(){var ns={};pe.tl.forEach(function(t){if(t.day<=s.currentDay)t.nodes.forEach(function(n){ns[n]=true;});});return ns;},[s.currentDay,s.selectedPersona]);
+  var curPhase=useMemo(function(){var ph="탐색 중";pe.tl.forEach(function(t){if(t.day<=s.currentDay){if(t.nodes.some(function(n){return n.indexOf("크리에이터")>=0;}))ph="크리에이터 전환";else if(t.nodes.some(function(n){return n.indexOf("메인게임")>=0||n.indexOf("시즌")>=0;}))ph="메인 게임 유입";else if(t.nodes.some(function(n){return n.indexOf("플랫폼")>=0;}))ph="플랫폼 활성";else ph="앱 탐색";}});return ph;},[s.currentDay,s.selectedPersona]);
+  var journeyNodes=[
+    {id:"메인게임",e:"🎮",label:"메인게임"},{id:"소셜",e:"📱",label:"소셜채널"},
+    {id:"플랫폼",e:"🎉",label:"앱플랫폼"},{id:"포토부스",e:"📷",label:"포토부스"},
+    {id:"밈메이커",e:"😂",label:"밈메이커"},{id:"NPC캐스팅",e:"🎬",label:"NPC캐스팅"},
+    {id:"관계도",e:"🔗",label:"관계도"},{id:"크리에이터존",e:"🎨",label:"크리에이터"}
+  ];
+  var latestNodes=useMemo(function(){var latest=null;pe.tl.forEach(function(t){if(t.day<=s.currentDay)latest=t;});return latest?latest.nodes:[];},[s.currentDay,s.selectedPersona]);
+  var animKey=useMemo(function(){return s.currentDay+"-"+s.selectedPersona;},[s.currentDay,s.selectedPersona]);
+  var streamLog=useMemo(function(){
+    var logs=[];pe.tl.forEach(function(t){if(t.day<=s.currentDay){t.nodes.forEach(function(n){logs.push({day:t.day,node:n});});}});return logs;
+  },[s.currentDay,s.selectedPersona]);
+  var logRef=useRef(null);
+  useEffect(function(){if(logRef.current)logRef.current.scrollTop=logRef.current.scrollHeight;},[streamLog.length]);
+  /* L6 milestones — expanded based on Notion doc phases */
+  var milestones=[
+    {day:0,phase:"메인 게임 런칭",icon:"🎮",color:T.t3},
+    {day:1,phase:"첫 앱 배포 (포토부스)",icon:"📷",color:T.accent},
+    {day:7,phase:"소셜 채널 개설",icon:"📱",color:T.expansion},
+    {day:14,phase:"소셜→앱 유입 시작",icon:"📥",color:T.expansion},
+    {day:30,phase:"플랫폼 전환 (30개 앱)",icon:"🎉",color:T.balance},
+    {day:45,phase:"시즌 1 업데이트",icon:"⚔",color:T.accent},
+    {day:60,phase:"프리미엄 앱 도입",icon:"💎",color:T.expansion},
+    {day:75,phase:"데이터 파이프라인 구축",icon:"📊",color:T.balance},
+    {day:90,phase:"파트너 API 개방",icon:"🔓",color:T.balance},
+    {day:100,phase:"시즌 2 + 대규모 연동",icon:"🎮",color:T.accent},
+    {day:110,phase:"허가형 파트너 입점",icon:"🤝",color:"#A78BFA"},
+    {day:120,phase:"SDK 베타 배포",icon:"🛠",color:T.expansion},
+    {day:140,phase:"서드파티 앱 등장",icon:"🔧",color:T.balance},
+    {day:160,phase:"데이터 플라이휠 가동",icon:"🔄",color:T.core},
+    {day:180,phase:"크리에이터 생태계 개방",icon:"🌐",color:T.core},
+    {day:200,phase:"무허가 창작 티어 개방",icon:"🎨",color:"#34D399"},
+    {day:220,phase:"크리에이터 오피셜 승격",icon:"⭐",color:T.expansion},
+    {day:240,phase:"완전 생태계 구축",icon:"🏆",color:T.core}
+  ];
+  var curMs=milestones[0];milestones.forEach(function(m){if(s.currentDay>=m.day)curMs=m;});
+  /* Ecosystem participants */
+  var participants=[
+    {label:"개발자",icon:"💻",calc:function(dd){return dd<90?0:dd<120?Math.round((dd-90)/30*8):dd<180?8+Math.round((dd-120)/60*25):33+Math.round((dd-180)/60*50);}},
+    {label:"크리에이터",icon:"🎨",calc:function(dd){return dd<120?0:dd<180?Math.round((dd-120)/60*12):12+Math.round((dd-180)/60*40);}},
+    {label:"서드파티",icon:"📱",calc:function(dd){return dd<90?0:dd<120?Math.round((dd-90)/30*3):3+Math.round((dd-120)/120*20);}}
+  ];
+  /* Ecosystem output metrics */
+  var ecoOutputs=[
+    {label:"SDK 다운로드",icon:"📦",calc:function(dd){return dd<120?0:dd<180?Math.round((dd-120)/60*120):120+Math.round((dd-180)/60*400);}},
+    {label:"API 호출/일",icon:"⚡",calc:function(dd){return dd<90?0:dd<120?Math.round((dd-90)/30*500):500+Math.round((dd-120)/120*8000);}},
+    {label:"2차 창작물",icon:"✍️",calc:function(dd){return dd<120?0:dd<180?Math.round((dd-120)/60*45):45+Math.round((dd-180)/60*200);}}
+  ];
+  /* Customer-side metrics */
+  var custMetrics=[
+    {label:"플랫폼 DAU",icon:"👥",calc:function(dd){return dd<1?0:dd<30?Math.round(dd*35):dd<90?1050+Math.round((dd-30)/60*3000):4050+Math.round((dd-90)/150*12000);}},
+    {label:"앱 탐색률",icon:"🔍",calc:function(dd){return dd<30?0:dd<90?Math.round(15+(dd-30)/60*25):40+Math.round((dd-90)/150*30);},pct:true},
+    {label:"메인게임 전환",icon:"🎮",calc:function(dd){return dd<7?0:dd<30?Math.round(2+(dd-7)/23*6):dd<90?8+Math.round((dd-30)/60*7):15+Math.round((dd-90)/150*10);},pct:true},
+    {label:"소셜 공유/일",icon:"📣",calc:function(dd){return dd<1?0:dd<30?Math.round(dd*8):dd<90?240+Math.round((dd-30)/60*600):840+Math.round((dd-90)/150*3000);}},
+    {label:"크레딧 전환율",icon:"💳",calc:function(dd){return dd<60?0:dd<120?Math.round(3+(dd-60)/60*8):11+Math.round((dd-120)/120*12);},pct:true},
+    {label:"데이터 수집량",icon:"💾",calc:function(dd){return dd<1?0:dd<30?Math.round(dd*20):dd<90?600+Math.round((dd-30)/60*2400):3000+Math.round((dd-90)/150*15000);}}
+  ];
+  var cycle=[
+    {icon:"📱",label:"앱 증가",on:s.currentDay>=30},{icon:"👥",label:"유저 유입",on:s.currentDay>=30},
+    {icon:"📊",label:"데이터",on:s.currentDay>=60},{icon:"🔓",label:"개방",on:s.currentDay>=90},
+    {icon:"💻",label:"개발자",on:s.currentDay>=120},{icon:"🔄",label:"선순환",on:s.currentDay>=180}
+  ];
+  /* Radial helper — bigger icons, highlight animation */
+  function Radial(props){
+    var items=props.items,cEmoji=props.center,bColor=props.color,R=props.radius||80;
+    return React.createElement("div",{style:{flex:1,position:"relative",display:"flex",alignItems:"center",justifyContent:"center",minHeight:0}},
+      React.createElement("div",{style:{position:"absolute",zIndex:5,width:44,height:44,borderRadius:"50%",background:bColor+"20",border:"2.5px solid "+bColor,display:"flex",alignItems:"center",justifyContent:"center",fontSize:21,boxShadow:"0 0 16px "+bColor+"35"}},cEmoji),
+      items.map(function(nd,i){
+        var ang=(i/items.length)*Math.PI*2-Math.PI/2;
+        var x=Math.cos(ang)*R,y=Math.sin(ang)*R;
+        return React.createElement("div",{key:nd.key||("n-"+i)},
+          React.createElement("svg",{style:{position:"absolute",top:"50%",left:"50%",width:0,height:0,overflow:"visible",zIndex:1}},
+            React.createElement("line",{x1:0,y1:0,x2:x,y2:y,stroke:nd.on?(nd.hi?bColor:bColor+"50"):T.t3,strokeWidth:nd.on?(nd.hi?2:1):0.5,strokeDasharray:nd.on?(nd.hi?"none":"4 3"):"3 4",opacity:nd.on?(nd.hi?0.9:0.3):0.06})
+          ),
+          React.createElement("div",{style:{position:"absolute",top:"calc(50% + "+y+"px)",left:"calc(50% + "+x+"px)",transform:"translate(-50%,-50%)"+(nd.on?" scale(1)":" scale(0.7)"),zIndex:3,display:"flex",flexDirection:"column",alignItems:"center",gap:2,transition:"all 0.3s"}},
+            React.createElement("div",{style:{"--hl-color":bColor+"80",width:36,height:36,borderRadius:"50%",background:nd.on?bColor+"18":"rgba(255,255,255,0.03)",border:"2px solid "+(nd.hi?bColor:nd.on?bColor+"50":"rgba(255,255,255,0.06)"),display:"flex",alignItems:"center",justifyContent:"center",fontSize:17,opacity:nd.on?1:0.2,boxShadow:nd.hi?"0 0 14px "+bColor+"45":"none",transition:"all 0.3s",animation:nd.hi?"nodeHighlight 0.8s ease-out":"none"}},nd.e),
+            React.createElement("span",{style:{fontSize:8,color:nd.on?bColor:"rgba(255,255,255,0.12)",fontWeight:600,textAlign:"center",lineHeight:1,whiteSpace:"nowrap"}},nd.label)
+          )
+        );
+      })
+    );
+  }
+  var jItems=journeyNodes.map(function(nd){
+    var act=!!an[nd.id];var isL=latestNodes.indexOf(nd.id)>=0||latestNodes.some(function(ln){return nd.id.indexOf(ln)>=0||ln.indexOf(nd.id)>=0;});
+    return {key:nd.id+"-"+animKey,e:nd.e,label:nd.label,on:act,hi:isL};
+  });
+  var cItems=cycle.map(function(c,i){return {key:"cy-"+i,e:c.icon,label:c.label,on:c.on,hi:c.on&&s.currentDay>=180};});
+  return(
+    <Panel id="panel-L5L6" color={T.L.L5} label={"🗺 고객 여정 / 생태계 확장"} delay={0.25}
+      badge={<span style={{fontFamily:mono,fontSize:8,color:pe.color,fontWeight:600}}>{ct+"개 · "+curPhase+" | "+curMs.icon+" "+curMs.phase}</span>}>
+      {/* ── Top Metrics Section ── */}
+      <div style={{display:"flex",gap:4,marginBottom:5,flexShrink:0,alignItems:"stretch"}}>
+        {/* Persona buttons — match LOG width */}
+        <div style={{width:130,flexShrink:0,display:"flex",gap:3,alignItems:"center",justifyContent:"center"}}>
+          {Object.entries(PERS).map(function(entry){var k=entry[0],p=entry[1];var aa=(s.selectedPersona||"A")===k;return <button key={k} onClick={function(){d({type:"SELECT_PERSONA",payload:k});}} style={{width:30,height:30,borderRadius:T.R.sm,border:"1.5px solid "+(aa?p.color:T.border),background:aa?p.color+"15":T.card,cursor:"pointer",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:1,transition:"all 0.2s",flexShrink:0,padding:2}}>
+            <span style={{fontSize:12,lineHeight:1}}>{p.emoji}</span>
+            <span style={{fontSize:6,color:aa?p.color:T.t3,fontWeight:700,lineHeight:1}}>{p.name}</span>
+          </button>;})}
+        </div>
+        {/* Center metrics — fills remaining space */}
+        <div style={{flex:1,display:"flex",gap:6,minWidth:0}}>
+          {/* Customer Metrics */}
+          <div style={{flex:1,display:"flex",flexDirection:"column",gap:2,minWidth:0}}>
+            <div style={{fontSize:7,color:T.t3,fontWeight:600,textTransform:"uppercase",letterSpacing:0.8,fontFamily:mono}}>{"👤 고객 지표"}</div>
+            <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:3}}>
+              {custMetrics.map(function(m){var v=m.calc(s.currentDay);return <div key={m.label} style={{display:"flex",alignItems:"center",gap:3,padding:"2px 4px",borderRadius:4,background:T.card,border:"1px solid "+T.border}}>
+                <span style={{fontSize:8,flexShrink:0}}>{m.icon}</span>
+                <div style={{minWidth:0}}>
+                  <div style={{fontFamily:mono,fontSize:9,fontWeight:700,color:v>0?T.t1:T.t3,lineHeight:1.1}}>{m.pct?(v+"%"):fN(v)}</div>
+                  <div style={{fontSize:6,color:T.t3,lineHeight:1.1,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{m.label}</div>
+                </div>
+              </div>;})}
+            </div>
+          </div>
+          {/* Ecosystem Metrics */}
+          <div style={{flex:1,display:"flex",flexDirection:"column",gap:2,minWidth:0}}>
+            <div style={{fontSize:7,color:T.t3,fontWeight:600,textTransform:"uppercase",letterSpacing:0.8,fontFamily:mono}}>{"🔧 생태계 지표"}</div>
+            <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:3}}>
+              {participants.map(function(p){var v=p.calc(s.currentDay);return <div key={p.label} style={{display:"flex",alignItems:"center",gap:3,padding:"2px 4px",borderRadius:4,background:T.card,border:"1px solid "+T.border}}>
+                <span style={{fontSize:8,flexShrink:0}}>{p.icon}</span>
+                <div style={{minWidth:0}}>
+                  <div style={{fontFamily:mono,fontSize:9,fontWeight:700,color:v>0?T.t1:T.t3,lineHeight:1.1}}>{v}</div>
+                  <div style={{fontSize:6,color:T.t3,lineHeight:1.1,whiteSpace:"nowrap"}}>{p.label}</div>
+                </div>
+              </div>;})}
+              {ecoOutputs.map(function(m){var v=m.calc(s.currentDay);return <div key={m.label} style={{display:"flex",alignItems:"center",gap:3,padding:"2px 4px",borderRadius:4,background:T.card,border:"1px solid "+T.border}}>
+                <span style={{fontSize:8,flexShrink:0}}>{m.icon}</span>
+                <div style={{minWidth:0}}>
+                  <div style={{fontFamily:mono,fontSize:9,fontWeight:700,color:v>0?T.t1:T.t3,lineHeight:1.1}}>{fN(v)}</div>
+                  <div style={{fontSize:6,color:T.t3,lineHeight:1.1,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{m.label}</div>
+                </div>
+              </div>;})}
+            </div>
+          </div>
+        </div>
+        {/* Spacer — match MILESTONES width */}
+        <div style={{width:130,flexShrink:0}}/>
+      </div>
+      {/* ── Main: Log | Journey ○ + Cycle ○ | Milestones ── */}
+      <div style={{flex:1,display:"flex",gap:4,minHeight:0}}>
+        {/* Log — fixed width */}
+        <div style={{width:130,flexShrink:0,display:"flex",flexDirection:"column",background:T.card,borderRadius:T.R.sm,border:"1px solid "+T.border,overflow:"hidden",minHeight:0}}>
+          <div style={{display:"flex",alignItems:"center",gap:3,padding:"3px 5px",flexShrink:0,borderBottom:"1px solid rgba(255,255,255,0.04)"}}>
+            <div style={{width:4,height:4,borderRadius:"50%",background:s.isPlaying?T.accent:"#555",animation:s.isPlaying?"pulse 1.5s ease infinite":"none"}}/>
+            <span style={{fontSize:8,color:T.L.L5,fontWeight:700,fontFamily:mono}}>{"LOG"}</span>
+            <span style={{fontSize:7,color:T.t3,fontFamily:mono,marginLeft:"auto"}}>{streamLog.length}</span>
+          </div>
+          <div ref={logRef} style={{flex:1,overflow:"auto",padding:"2px 3px",display:"flex",flexDirection:"column",gap:0}}>
+            {streamLog.length===0&&<div style={{fontSize:8,color:T.t3,textAlign:"center",padding:6}}>대기 중...</div>}
+            {streamLog.map(function(lg,i){var isLast=i>=streamLog.length-3;return <div key={i} style={{display:"flex",alignItems:"center",gap:2,padding:"1px 3px",borderRadius:3,background:isLast?pe.color+"08":"transparent",opacity:isLast?1:0.4,flexShrink:0}}>
+              <span style={{fontFamily:mono,fontSize:7,color:pe.color,fontWeight:700,minWidth:16}}>{"D"+lg.day}</span>
+              <span style={{width:3,height:3,borderRadius:"50%",background:pe.color,flexShrink:0,opacity:isLast?1:0.3}}/>
+              <span style={{fontSize:7,color:isLast?T.t1:T.t3,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{lg.node}</span>
+            </div>;})}
+          </div>
+        </div>
+        {/* Center area — radials fill remaining space */}
+        <div style={{flex:1,display:"flex",gap:0,minHeight:0}}>
+          {/* Journey Radial */}
+          <Radial items={jItems} center={pe.emoji} color={pe.color} radius={84}/>
+          {/* Cycle Radial */}
+          <Radial items={cItems} center={"🔄"} color={T.L.L6} radius={74}/>
+        </div>
+        {/* Milestones — same fixed width as Log */}
+        <div style={{width:130,flexShrink:0,display:"flex",flexDirection:"column",background:T.card,borderRadius:T.R.sm,border:"1px solid "+T.border,overflow:"hidden",minHeight:0}}>
+          <div style={{display:"flex",alignItems:"center",gap:3,padding:"3px 5px",flexShrink:0,borderBottom:"1px solid rgba(255,255,255,0.04)"}}>
+            <span style={{fontSize:8,color:T.core,fontWeight:700,fontFamily:mono}}>{"MILESTONES"}</span>
+            <span style={{fontSize:7,color:T.t3,fontFamily:mono,marginLeft:"auto"}}>{milestones.filter(function(m){return s.currentDay>=m.day;}).length+"/"+milestones.length}</span>
+          </div>
+          <div style={{flex:1,overflow:"auto",padding:"3px 4px",display:"flex",flexDirection:"column",gap:2}}>
+            {milestones.map(function(m,i){var on=s.currentDay>=m.day;var isCur=curMs===m;return <div key={i} style={{display:"flex",alignItems:"center",gap:4,padding:"3px 4px",borderRadius:4,background:isCur?m.color+"10":"transparent",border:"1px solid "+(isCur?m.color+"30":"transparent"),transition:"all 0.2s",flexShrink:0}}>
+              <div style={{width:16,height:16,borderRadius:"50%",background:on?m.color+"20":"rgba(255,255,255,0.03)",border:"1.5px solid "+(on?m.color+(isCur?"":"50"):"rgba(255,255,255,0.08)"),display:"flex",alignItems:"center",justifyContent:"center",fontSize:8,flexShrink:0}}>{on?m.icon:"🔒"}</div>
+              <div style={{flex:1,minWidth:0}}>
+                <div style={{fontSize:7,color:on?m.color:T.t3,fontWeight:isCur?700:500,lineHeight:1.2}}>{m.phase}</div>
+                <div style={{fontFamily:mono,fontSize:6,color:T.t3}}>{"D+"+m.day}</div>
+              </div>
+            </div>;})}
+          </div>
+        </div>
+      </div>
+    </Panel>
+  );
+}
+
+/* ══════ L7: 수익 모델 ══════ */
+function L7(){
+  var s=useApp().state;
+  var data=useMemo(function(){
+    var pts=[];var maxD=Math.max(s.currentDay,1);var numSteps=Math.min(maxD,30);var step=Math.max(1,Math.floor(maxD/numSteps));
+    for(var dd=0;dd<=maxD;dd+=step){var pt={day:dd,ctl:Math.round(lerp(REV_CTL,dd))};REV_KEYS.forEach(function(kc){pt[kc[0]]=dd>=kc[1].start?Math.round(lerp(kc[1].k,dd)):0;});pts.push(pt);}
+    if(pts.length&&pts[pts.length-1].day!==maxD){var pt2={day:maxD,ctl:Math.round(lerp(REV_CTL,maxD))};REV_KEYS.forEach(function(kc){pt2[kc[0]]=maxD>=kc[1].start?Math.round(lerp(kc[1].k,maxD)):0;});pts.push(pt2);}
+    return pts;
+  },[s.currentDay]);
+  var total=0;REV_KEYS.forEach(function(kc){if(s.currentDay>=kc[1].start)total+=Math.round(lerp(kc[1].k,s.currentDay));});
+  var activeRevs=REV_KEYS.filter(function(kc){return s.currentDay>=kc[1].start;});
+  return(
+    <Panel id="panel-L7" color={T.L.L7} label={"💰 수익 모델"} delay={0.35}
+      badge={<span style={{fontFamily:mono,fontSize:12,color:T.core,fontWeight:700}}>{"$"+fN(total)}</span>}>
+      <div style={{display:"flex",gap:5,flexWrap:"wrap",marginBottom:3,flexShrink:0}}>
+        {REV_KEYS.map(function(kc){var on=s.currentDay>=kc[1].start;return <div key={kc[0]} style={{display:"flex",alignItems:"center",gap:3,opacity:on?1:0.3}}>
+          <div style={{width:6,height:6,borderRadius:2,background:kc[1].color}}/>
+          <span style={{fontSize:8,color:on?T.t2:T.t3,fontFamily:mono}}>{kc[1].label}</span>
+        </div>;})}
+        <div style={{display:"flex",alignItems:"center",gap:3,opacity:0.5}}>
+          <div style={{width:10,height:0,borderTop:"1.5px dashed "+T.t3}}/>
+          <span style={{fontSize:8,color:T.t3,fontFamily:mono}}>대조군</span>
+        </div>
+      </div>
+      <div style={{flex:1,minHeight:0}}><SvgStacked data={data} keys={REV_KEYS}/></div>
+      {activeRevs.length>0&&<div style={{display:"flex",gap:3,flexShrink:0,marginTop:3}}>
+        {activeRevs.map(function(kc){var v=Math.round(lerp(kc[1].k,s.currentDay));return <div key={kc[0]} style={{flex:1,padding:"3px 3px",borderRadius:6,background:kc[1].color+"06",border:"1px solid "+kc[1].color+"15",textAlign:"center"}}>
+          <div style={{fontFamily:mono,fontSize:10,fontWeight:700,color:kc[1].color}}>{"$"+fN(v)}</div>
+          <div style={{fontSize:8,color:T.t3}}>{kc[1].label}</div>
+        </div>;})}
+      </div>}
+    </Panel>
+  );
+}
+
+/* ══════ CONNECTION VIEW — opaque overlay with panel-aligned boxes ══════ */
+var PANEL_META={
+  L2:{color:T.L.L2,name:"앱 스토어",icon:"📱"},
+  L1:{color:T.L.L1,name:"런칭된 앱",icon:"📱"},
+  L4:{color:T.L.L4,name:"소셜 채널",icon:"📢"},
+  Ctrl:{color:T.accent,name:"컨트롤러",icon:"🎛"},
+  L5L6:{color:T.L.L5,name:"고객 여정 / 생태계",icon:"🗺"},
+  L7:{color:T.L.L7,name:"수익 모델",icon:"💰"}
+};
+/* Panel boxes with inset padding (12px smaller on each side from actual panels) */
+var P=12;
+var CB={
+  L2:   {x:14+P, y:10+P, w:208-P*2, h:536-P*2},
+  L1:   {x:232+P, y:10+P, w:200-P*2, h:170-P*2},
+  L4:   {x:440+P, y:10+P, w:200-P*2, h:170-P*2},
+  Ctrl: {x:648+P, y:10+P, w:338-P*2, h:218-P*2},
+  L5L6: {x:232+P, y:188+P, w:408-P*2, h:358-P*2},
+  L7:   {x:648+P, y:236+P, w:338-P*2, h:310-P*2}
+};
+/* Edge helper: get a point on edge of box, inset 18px from boundary */
+function edgePt(boxKey,side,offset){
+  var b=CB[boxKey];var ins=18;var off=offset||0.5;
+  if(side==="left")  return {x:b.x+ins, y:b.y+b.h*off};
+  if(side==="right") return {x:b.x+b.w-ins, y:b.y+b.h*off};
+  if(side==="top")   return {x:b.x+b.w*off, y:b.y+ins};
+  if(side==="bottom")return {x:b.x+b.w*off, y:b.y+b.h-ins};
+  return {x:b.x+b.w/2,y:b.y+b.h/2};
+}
+/* Arrow definitions with edge-aware endpoints for correct arrowhead direction */
+var CONN_ARROWS=[
+  {id:"ar-01",color:T.balance,minDay:30,desc:"앱 런칭 → 스토어 등록",
+    s:{box:"L1",side:"left",off:0.5},e:{box:"L2",side:"right",off:0.18},
+    lbl:{x:250,y:55,anchor:"start"}},
+  {id:"ar-02",color:T.expansion,minDay:1,desc:"앱 런칭 → 소셜 알림",
+    s:{box:"L1",side:"right",off:0.35},e:{box:"L4",side:"left",off:0.35},
+    lbl:{x:410,y:45,anchor:"middle"}},
+  {id:"ar-03",color:T.expansion,minDay:7,desc:"소셜 유입 → 고객 여정",
+    s:{box:"L4",side:"bottom",off:0.65},e:{box:"L5L6",side:"top",off:0.55},
+    lbl:{x:530,y:185,anchor:"start"}},
+  {id:"ar-04",color:T.accent,minDay:30,desc:"앱 사용 → 여정 진행",
+    s:{box:"L1",side:"bottom",off:0.4},e:{box:"L5L6",side:"top",off:0.2},
+    lbl:{x:258,y:185,anchor:"start"}},
+  {id:"ar-05",color:T.balance,minDay:45,desc:"유저 탐색 → 앱 발견",
+    s:{box:"L5L6",side:"top",off:0.08},e:{box:"L1",side:"bottom",off:0.7},
+    lbl:{x:295,y:160,anchor:"start"}},
+  {id:"ar-06",color:T.core,minDay:120,desc:"생태계 성장 → 수익 창출",
+    s:{box:"L5L6",side:"right",off:0.4},e:{box:"L7",side:"left",off:0.35},
+    lbl:{x:636,y:345,anchor:"middle"}},
+  {id:"ar-07",color:T.core,minDay:70,desc:"고객 활성 → 앱 확장",
+    s:{box:"L5L6",side:"left",off:0.5},e:{box:"L2",side:"right",off:0.55},
+    lbl:{x:250,y:385,anchor:"start"}},
+  {id:"ar-08",color:"#A78BFA",minDay:100,desc:"수익 재투자 → 앱 추가",
+    s:{box:"L7",side:"top",off:0.7},e:{box:"L1",side:"right",off:0.7},
+    lbl:{x:680,y:125,anchor:"start"}}
+];
+/* Direction vectors for each edge side */
+var EDGE_DIR={left:{x:-1,y:0},right:{x:1,y:0},top:{x:0,y:-1},bottom:{x:0,y:1}};
+function connPath(ca){
+  var a=edgePt(ca.s.box,ca.s.side,ca.s.off);
+  var b=edgePt(ca.e.box,ca.e.side,ca.e.off);
+  var ds=EDGE_DIR[ca.s.side],de=EDGE_DIR[ca.e.side];
+  var dx=b.x-a.x,dy=b.y-a.y;
+  var dist=Math.sqrt(dx*dx+dy*dy);
+  var pull=Math.max(40,dist*0.35);
+  /* Control point 1: leaves p1 in the direction of its edge outward */
+  var cx1=a.x+ds.x*pull, cy1=a.y+ds.y*pull;
+  /* Control point 2: approaches p2 FROM the direction of its edge outward (so arrow points inward) */
+  var cx2=b.x+de.x*pull, cy2=b.y+de.y*pull;
+  return {a:a,b:b,d:"M"+a.x+","+a.y+" C"+cx1+","+cy1+" "+cx2+","+cy2+" "+b.x+","+b.y};
+}
+function ConnectionView(){
+  var ctx=useApp(),s=ctx.state,d=ctx.dispatch;
+  if(!s.showConnections)return null;
+  var activeIds={};ARROWS.forEach(function(a){if(s.currentDay>=a.minDay)activeIds[a.id]=true;});
+  var boxOrder=["L2","L1","L4","Ctrl","L5L6","L7"];
+  return(
+    <div style={{position:"absolute",inset:0,zIndex:20,background:"rgba(14,14,28,0.7)",borderRadius:T.R.md,animation:"fadeIn 0.25s",overflow:"hidden",cursor:"pointer"}}
+      onClick={function(){d({type:"TOGGLE_CONNECTIONS"});}}>
+      <svg viewBox="0 0 1000 560" preserveAspectRatio="xMidYMid meet" style={{width:"100%",height:"100%",display:"block"}}>
+        <defs>
+          {CONN_ARROWS.map(function(ar){return <marker key={"mk-"+ar.id} id={"mk-"+ar.id} markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill={ar.color} opacity="0.95"/></marker>;})}
+        </defs>
+        {/* Panel boxes — much more opaque */}
+        {boxOrder.map(function(ly){var r=CB[ly];var mt=PANEL_META[ly];
+          return <g key={ly}>
+            <rect x={r.x} y={r.y} width={r.w} height={r.h} rx="8" ry="8" fill={mt.color+"18"} stroke={mt.color+"60"} strokeWidth="1.8"/>
+            <rect x={r.x+1} y={r.y+1} width={r.w-2} height={r.h-2} rx="7" ry="7" fill="rgba(18,18,36,0.75)" stroke="none"/>
+            <text x={r.x+r.w/2} y={r.y+r.h/2-5} fill={mt.color} fontSize="11" fontWeight="700" textAnchor="middle" fontFamily={mono} opacity="0.9">{mt.icon+" "+mt.name}</text>
+            <text x={r.x+r.w/2} y={r.y+r.h/2+10} fill={mt.color} fontSize="8" textAnchor="middle" fontFamily={mono} opacity="0.4">{ly==="Ctrl"?"CTRL":ly==="L5L6"?"L5·L6":ly}</text>
+          </g>;
+        })}
+        {/* Arrow paths — edge-aware beziers with correct arrowhead direction */}
+        {CONN_ARROWS.map(function(ca){var active=!!activeIds[ca.id];
+          var cp=connPath(ca);
+          return <path key={"cp-"+ca.id} d={cp.d} fill="none" stroke={ca.color} strokeWidth={active?2.5:1} strokeDasharray={active?"none":"6 4"} markerEnd={"url(#mk-"+ca.id+")"} opacity={active?0.85:0.1} strokeLinecap="round"/>;
+        })}
+        {/* Arrow labels — explicitly positioned, no overlaps */}
+        {CONN_ARROWS.map(function(ca){var active=!!activeIds[ca.id];
+          if(!active)return null;
+          var lx=ca.lbl.x,ly2=ca.lbl.y;
+          var tw=ca.desc.length*5.5+16;
+          var rx=ca.lbl.anchor==="middle"?lx-tw/2:ca.lbl.anchor==="end"?lx-tw:lx;
+          return <g key={"lbl-"+ca.id}>
+            <rect x={rx-4} y={ly2-9} width={tw+8} height={18} rx="5" fill="rgba(16,20,40,0.92)" stroke={ca.color+"50"} strokeWidth="1"/>
+            <circle cx={rx+3} cy={ly2} r="3" fill={ca.color}/>
+            <text x={rx+10} y={ly2+4} fill={T.t1} fontSize="8" fontWeight="500" fontFamily={mono}>{ca.desc}</text>
+          </g>;
+        })}
+        {/* Close hint */}
+        <rect x={936} y={10} width={52} height={22} rx="6" fill="rgba(16,20,40,0.9)" stroke={T.border} strokeWidth="1"/>
+        <text x={962} y={24} fill={T.t2} fontSize="9" textAnchor="middle" fontFamily={mono}>{"✕ ESC"}</text>
+      </svg>
+    </div>
+  );
+}
+
+/* ══════ MODALS ══════ */
+function DetailModal(){
+  var ctx=useApp(),s=ctx.state,d=ctx.dispatch;
+  if(!s.activeModal)return null;
+  var m=s.activeModal;var isApp=m.type==="app";
+  var lk=["L1","L2","L4","L5L6","L7"].indexOf(m.type)>=0?m.type:null;
+  var color=lk?(T.L[lk]||T.L.L5):isApp?T.balance:T.t3;
+  var names={L1:"📱 앱 리스트",L2:"📱 앱 플랫폼",L4:"📱 소셜 채널",L5L6:"🗺 고객 여정 / 생태계 확장",L7:"💰 수익 모델"};
+  function close(){d({type:"CLOSE_MODAL"});}
+  if(isApp&&m.data){
+    var app=m.data;
+    var stars=Math.min(5,Math.max(3,Math.round(4.2+((app.id.charCodeAt(1)||0)%10-5)*0.15)));
+    var dl=Math.round(100+app.d*2.3+((app.id.charCodeAt(2)||0)%50));
+    return(
+      <div onClick={close} style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.6)",zIndex:100,display:"flex",alignItems:"center",justifyContent:"center",animation:"fadeIn 0.2s",backdropFilter:"blur(6px)"}}>
+        {/* Phone Frame */}
+        <div onClick={function(e){e.stopPropagation();}} style={{width:220,height:420,background:"#111",borderRadius:28,padding:"8px 6px",boxShadow:"0 20px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.1)",animation:"modalIn 0.3s",display:"flex",flexDirection:"column",position:"relative"}}>
+          {/* Notch */}
+          <div style={{position:"absolute",top:6,left:"50%",transform:"translateX(-50%)",width:60,height:5,borderRadius:3,background:"#222",zIndex:5}}/>
+          {/* Screen */}
+          <div style={{flex:1,background:"linear-gradient(180deg,#1a1a2e,#0f0f23)",borderRadius:22,overflow:"hidden",display:"flex",flexDirection:"column"}}>
+            {/* Status bar */}
+            <div style={{display:"flex",justifyContent:"space-between",padding:"10px 14px 4px",flexShrink:0}}>
+              <span style={{fontFamily:mono,fontSize:8,color:T.t3}}>{"9:41"}</span>
+              <div style={{display:"flex",gap:3}}>
+                <span style={{fontSize:8,color:T.t3}}>{"📶"}</span>
+                <span style={{fontSize:8,color:T.t3}}>{"🔋"}</span>
+              </div>
+            </div>
+            {/* Nav bar */}
+            <div style={{display:"flex",alignItems:"center",padding:"2px 10px 6px",flexShrink:0}}>
+              <button onClick={close} style={{fontSize:10,color:T.balance,background:"none",border:"none",cursor:"pointer",padding:"2px 4px"}}>{"‹ 뒤로"}</button>
+            </div>
+            {/* App hero section */}
+            <div style={{padding:"8px 16px",flexShrink:0}}>
+              <div style={{display:"flex",alignItems:"center",gap:10}}>
+                <div style={{width:48,height:48,borderRadius:12,background:"linear-gradient(135deg,"+T.card+","+T.surface+")",border:"1px solid "+T.borderHover,display:"flex",alignItems:"center",justifyContent:"center",fontSize:26,flexShrink:0}}>{app.e}</div>
+                <div style={{flex:1}}>
+                  <div style={{fontSize:13,color:T.t1,fontWeight:700}}>{app.n}</div>
+                  <div style={{fontSize:8,color:T.t3,marginTop:2}}>{app.ax+" · D+"+app.d+" 런칭"}</div>
+                  <div style={{fontSize:9,color:"#ffc107",marginTop:2,letterSpacing:-0.5}}>{"★".repeat(stars)+"☆".repeat(5-stars)}<span style={{fontSize:8,color:T.t3,marginLeft:3}}>{stars+"."+((app.id.charCodeAt(0)||0)%5+3)}</span></div>
+                </div>
+              </div>
+            </div>
+            {/* Install button */}
+            <div style={{padding:"4px 16px 8px",flexShrink:0}}>
+              <div style={{padding:"7px 0",borderRadius:20,background:app.creditCost>0?"linear-gradient(135deg,"+T.expansion+",#e88d2a)":"linear-gradient(135deg,"+T.core+",#2a9f97)",textAlign:"center",cursor:"pointer"}}>
+                <span style={{fontSize:10,color:"#fff",fontWeight:700}}>{app.creditCost>0?app.creditCost+"C 구매":"무료 설치"}</span>
+              </div>
+            </div>
+            {/* Divider */}
+            <div style={{height:1,background:"rgba(255,255,255,0.06)",margin:"0 14px"}}/>
+            {/* Stats row */}
+            <div style={{display:"flex",padding:"8px 14px",gap:0,flexShrink:0}}>
+              {[{l:"다운로드",v:dl+"+"},{l:"크기",v:"12MB"},{l:"연령",v:"전체"}].map(function(st,i){return <div key={i} style={{flex:1,textAlign:"center",borderRight:i<2?"1px solid rgba(255,255,255,0.06)":"none"}}>
+                <div style={{fontFamily:mono,fontSize:10,color:T.t1,fontWeight:700}}>{st.v}</div>
+                <div style={{fontSize:8,color:T.t3,marginTop:1}}>{st.l}</div>
+              </div>;})}
+            </div>
+            <div style={{height:1,background:"rgba(255,255,255,0.06)",margin:"0 14px"}}/>
+            {/* Description */}
+            <div style={{flex:1,overflow:"auto",padding:"10px 16px"}}>
+              <div style={{fontSize:10,color:T.t1,fontWeight:600,marginBottom:4}}>설명</div>
+              <div style={{fontSize:9,color:T.t2,lineHeight:1.7}}>{app.desc}</div>
+              {app.isPremium&&<div style={{marginTop:8,padding:"5px 8px",borderRadius:6,background:T.expansion+"0A",border:"1px solid "+T.expansion+"20"}}>
+                <div style={{fontSize:8,color:T.expansion,fontWeight:600}}>{"💎 프리미엄 컨텐츠"}</div>
+                <div style={{fontSize:8,color:T.t3,marginTop:2}}>이 앱은 크레딧으로 구매할 수 있습니다</div>
+              </div>}
+              {app.is3rd&&<div style={{marginTop:8,padding:"5px 8px",borderRadius:6,background:T.balance+"0A",border:"1px solid "+T.balance+"20"}}>
+                <div style={{fontSize:8,color:T.balance,fontWeight:600}}>{"🔧 서드파티 개발"}</div>
+                <div style={{fontSize:8,color:T.t3,marginTop:2}}>외부 개발자가 제작한 앱입니다</div>
+              </div>}
+              <div style={{marginTop:10,fontSize:8,color:T.t3,fontFamily:mono}}>{"앱 ID: "+app.id}</div>
+            </div>
+            {/* Bottom bar */}
+            <div style={{display:"flex",justifyContent:"center",padding:"6px 0 10px",flexShrink:0}}>
+              <div style={{width:80,height:3,borderRadius:2,background:"rgba(255,255,255,0.2)"}}/>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+  return(
+    <div onClick={close} style={{position:"fixed",inset:0,background:"rgba(26,26,46,0.7)",zIndex:100,display:"flex",alignItems:"center",justifyContent:"center",animation:"fadeIn 0.2s",backdropFilter:"blur(4px)"}}>
+      <div onClick={function(e){e.stopPropagation();}} style={{width:"78vw",maxWidth:1000,maxHeight:"80vh",background:T.panel,border:"1px solid "+color+"30",borderRadius:T.R.lg,overflow:"hidden",display:"flex",flexDirection:"column",animation:"modalIn 0.25s",boxShadow:T.shadow}}>
+        <div style={{padding:"12px 18px",borderBottom:"1px solid "+T.border,display:"flex",alignItems:"center",justifyContent:"space-between",flexShrink:0}}>
+          <span style={{color:color,fontSize:14,fontWeight:700}}>{names[lk]||""}</span>
+          <button onClick={close} style={{width:26,height:26,borderRadius:T.R.sm,border:"1px solid "+T.border,background:"transparent",color:T.t1,fontSize:13,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>{"✕"}</button>
+        </div>
+        <div style={{flex:1,overflow:"auto",padding:20}}>
+          {lk&&<div style={{color:T.t2,fontSize:12,lineHeight:1.7}}>{"상세 보기를 준비 중입니다. (D+"+s.currentDay+")"}</div>}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ══════ LAYOUT — 125% zoom optimized ══════ */
+function Layout(){
+  var wide=useApp().wide;
+  if(!wide)return(
+    <div id="layout-container" style={{flex:1,display:"flex",flexDirection:"column",gap:G,padding:G,overflow:"auto",position:"relative"}}>
+      <ConnectionView/>
+      <div style={{height:300,flexShrink:0}}><L2/></div>
+      <div style={{display:"flex",gap:G,height:220,flexShrink:0}}><div style={{flex:1}}><L1/></div><div style={{flex:1}}><L4/></div></div>
+      <div style={{height:180,flexShrink:0}}><CtrlPanel/></div>
+      <div style={{height:300,flexShrink:0}}><L5L6/></div>
+      <div style={{height:240,flexShrink:0}}><L7/></div>
+    </div>
+  );
+  /* ── Desktop: L2 left, center stack, right column ── */
+  return(
+    <div id="layout-container" style={{flex:1,display:"flex",gap:G,padding:"6px 12px 10px",overflow:"hidden",position:"relative",minHeight:0}}>
+      <ConnectionView/>
+      {/* LEFT: L2 App Store — narrower */}
+      <div style={{width:"22%",minWidth:200,flexShrink:0,display:"flex"}}><L2/></div>
+      {/* CENTER: stacked layers */}
+      <div style={{flex:1,display:"flex",flexDirection:"column",gap:G,minHeight:0,minWidth:0}}>
+        <div style={{flex:3,display:"flex",gap:G,minHeight:0}}>
+          <div style={{flex:5,display:"flex"}}><L1/></div>
+          <div style={{flex:5,display:"flex"}}><L4/></div>
+        </div>
+        <div style={{flex:5,display:"flex",minHeight:0}}>
+          <div style={{flex:1,display:"flex"}}><L5L6/></div>
+        </div>
+      </div>
+      {/* RIGHT COLUMN: CtrlPanel + L7 — wider */}
+      <div style={{width:280,flexShrink:0,display:"flex",flexDirection:"column",gap:G,minHeight:0}}>
+        <div style={{flex:4,display:"flex"}}><CtrlPanel/></div>
+        <div style={{flex:6,display:"flex"}}><L7/></div>
+      </div>
+    </div>
+  );
+}
+
+/* ══════ CONTROLLERS ══════ */
+function Keys(){
+  var ctx=useApp(),s=ctx.state,d=ctx.dispatch;
+  useEffect(function(){
+    function h(e){
+      if(e.target.tagName==="INPUT")return;
+      switch(e.code){
+        case "Space":e.preventDefault();d({type:"TOGGLE_PLAY"});break;
+        case "ArrowLeft":e.preventDefault();d({type:"SET_DAY",payload:s.currentDay-(e.shiftKey?10:1)});break;
+        case "ArrowRight":e.preventDefault();d({type:"SET_DAY",payload:s.currentDay+(e.shiftKey?10:1)});break;
+        case "Digit1":case "Numpad1":d({type:"SET_DAY",payload:0});break;
+        case "Digit2":case "Numpad2":d({type:"SET_DAY",payload:1});break;
+        case "Digit3":case "Numpad3":d({type:"SET_DAY",payload:30});break;
+        case "Digit4":case "Numpad4":d({type:"SET_DAY",payload:90});break;
+        case "Digit5":case "Numpad5":d({type:"SET_DAY",payload:180});break;
+        case "Escape":d({type:"CLOSE_MODAL"});break;
+        case "KeyC":d({type:"TOGGLE_CONNECTIONS"});break;
+      }
+    }
+    window.addEventListener("keydown",h);return function(){window.removeEventListener("keydown",h);};
+  },[s.currentDay,s.playbackSpeed,s.isPlaying]);
+  return null;
+}
+function AutoPlay(){
+  var ctx=useApp(),s=ctx.state,d=ctx.dispatch;var pt=useRef(null);
+  useEffect(function(){
+    if(!s.isPlaying)return;
+    var t=setInterval(function(){d({type:"SET_DAY",payload:s.currentDay+1});},1000/s.playbackSpeed);
+    return function(){clearInterval(t);};
+  },[s.isPlaying,s.playbackSpeed,s.currentDay]);
+  useEffect(function(){
+    if(s.isPlaying&&EV_DAYS.has(s.currentDay)&&!s.eventPaused){
+      d({type:"SET_PLAYING",payload:false});d({type:"SET_EVENT_PAUSED",payload:true});
+      pt.current=setTimeout(function(){d({type:"SET_EVENT_PAUSED",payload:false});d({type:"SET_PLAYING",payload:true});},1500);
+    }
+    return function(){if(pt.current)clearTimeout(pt.current);};
+  },[s.currentDay]);
+  useEffect(function(){if(s.currentDay>=240&&s.isPlaying)d({type:"SET_PLAYING",payload:false});},[s.currentDay,s.isPlaying]);
+  return null;
+}
+
+/* ══════ ROOT ══════ */
+function App(){
+  var _s=useReducer(reducer,init),state=_s[0],dispatch=_s[1];
+  var _w=useState(window.innerWidth>=1176),wide=_w[0],setWide=_w[1];
+  useEffect(function(){function c(){setWide(window.innerWidth>=1176);}window.addEventListener("resize",c);return function(){window.removeEventListener("resize",c);};},[]);
+  return(
+    <Ctx.Provider value={{state:state,dispatch:dispatch,wide:wide}}>
+      <div style={{width:"calc(100vw / 1.4)",height:"calc(100vh / 1.4)",transform:"scale(1.4)",transformOrigin:"0 0",background:T.bg,color:T.t1,display:"flex",flexDirection:"column",overflow:"hidden",position:"relative",zIndex:1}}>
+        <div style={{position:"absolute",top:"-50%",left:"-50%",width:"200%",height:"200%",background:"radial-gradient(ellipse at 30% 20%,rgba(233,69,96,0.03),transparent 50%),radial-gradient(ellipse at 70% 80%,rgba(78,205,196,0.03),transparent 50%)",animation:"bgRotate 40s linear infinite",pointerEvents:"none",zIndex:0}}/>
+        <Header/><Layout/><DetailModal/><Keys/><AutoPlay/>
+      </div>
+    </Ctx.Provider>
+  );
+}
+ReactDOM.createRoot(document.getElementById("root")).render(CE(App));
+</script>
+</body>
+</html>
