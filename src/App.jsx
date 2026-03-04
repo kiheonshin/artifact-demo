@@ -1,7 +1,7 @@
 import { useReducer, useState, useEffect, useRef, useCallback, useMemo } from "react";
 
 // ─────────────────────────────────────────────
-// 🏨 Hotel Tamaverse — 데모 게임 (Prompt 1 + 2)
+// 🏨 Tamaverse — 데모 게임 (Prompt 1 + 2)
 // 단일 .jsx 파일 · React + Tailwind · useReducer
 // ─────────────────────────────────────────────
 
@@ -519,18 +519,18 @@ const SOLO_ACTIONS = {
 };
 
 const DIARY_TEMPLATES = [
-  (n, day) => ({ title: `Day ${day}의 기록`, mood: "🌤️", weather: "맑음", body: `오늘은 Day ${day}. 호텔 생활이 점점 익숙해지고 있다. ${n.interests[0]}에 대해 깊이 생각해본 하루였다.\n\n아침에 일어나 창밖을 보니 햇살이 로비까지 들어왔다. 조식을 먹으며 어제 만난 사람들을 떠올렸다. 오후에는 혼자만의 시간을 가지며 ${n.interests[0]}에 몰두했다.\n\n내일은 좀 더 용기를 내서 새로운 공간을 탐험해봐야겠다. 이 호텔에는 아직 가보지 못한 곳이 많다.`, ps: `P.S. ${n.interests[1] || n.interests[0]}도 해보고 싶다` }),
+  (n, day) => ({ title: `Day ${day}의 기록`, mood: "🌤️", weather: "맑음", body: `오늘은 Day ${day}. 타마버스 생활이 점점 익숙해지고 있다. ${n.interests[0]}에 대해 깊이 생각해본 하루였다.\n\n아침에 일어나 창밖을 보니 햇살이 로비까지 들어왔다. 조식을 먹으며 어제 만난 사람들을 떠올렸다. 오후에는 혼자만의 시간을 가지며 ${n.interests[0]}에 몰두했다.\n\n내일은 좀 더 용기를 내서 새로운 공간을 탐험해봐야겠다. 이 타마버스에는 아직 가보지 못한 곳이 많다.`, ps: `P.S. ${n.interests[1] || n.interests[0]}도 해보고 싶다` }),
   (n, day) => ({ title: `새로운 만남`, mood: "😊", weather: "흐림", body: `Day ${day} 일기.\n\n새로운 사람들과의 만남이 즐거웠다. 특히 로비에서 우연히 마주친 사람과 ${n.interests[0]} 이야기를 나눌 수 있었다.\n\n대화 중에 서로의 취미가 비슷하다는 걸 알게 되었고, 다음에 함께 ${n.interests[1] || n.interests[0]}을(를) 해보기로 약속했다.\n\n사람과 사람 사이의 연결이란 참 신기하다. 같은 공간에 있다는 것만으로 이렇게 가까워질 수 있다니.`, ps: "내일이 벌써 기대된다" }),
-  (n, day) => ({ title: `벌써 Day ${day}`, mood: "🌙", weather: "별이 빛나는 밤", body: `벌써 Day ${day}이라니. 이 호텔에서의 시간이 특별하게 느껴진다.\n\n오늘은 좀 조용히 지냈다. ${n.interests[0]}을(를) 하면서 나 자신과 대화하는 시간을 가졌다. 때로는 이런 고요한 순간이 필요한 법이다.\n\n저녁에 옥상에 올라가니 하늘이 정말 예뻤다. 여기 있는 동안 이 풍경을 자주 봐야겠다.\n\n오늘의 한 줄: 가끔은 천천히 가는 것도 괜찮다.`, ps: null }),
-  (n, day) => ({ title: `특별한 하루`, mood: "⭐", weather: "따뜻함", body: `Day ${day}.\n\n오늘은 유독 특별한 하루였다. ${n.interests[0]}을(를) 하다가 예상치 못한 즐거움을 발견했다.\n\n호텔의 각 층마다 분위기가 다르다는 걸 새삼 느꼈다. 1층 로비의 편안함, 레스토랑의 따스한 조명, 루프탑의 시원한 바람까지.\n\n이런 공간에서 지내다 보면 일상에서 놓치고 있던 소소한 행복들이 보이기 시작한다.`, ps: `${n.interests[1] || "여행"}의 진짜 의미를 알 것 같다` }),
-  (n, day) => ({ title: `생각이 많은 밤`, mood: "🌜", weather: "안개", body: `Day ${day}, 늦은 밤.\n\n잠이 오지 않아 일기를 쓴다. 요즘 ${n.interests[0]}에 대해 새로운 시각이 생기고 있다.\n\n여기서 만난 사람들은 저마다 다른 이야기를 품고 있었다. 그 다양한 이야기들이 한 공간에서 교차하는 게 호텔 이돌의 매력인 것 같다.\n\n내일은 어떤 하루가 될까. 그 불확실함이 두렵기도 하지만, 동시에 설레기도 하다.`, ps: null }),
+  (n, day) => ({ title: `벌써 Day ${day}`, mood: "🌙", weather: "별이 빛나는 밤", body: `벌써 Day ${day}이라니. 이 타마버스에서의 시간이 특별하게 느껴진다.\n\n오늘은 좀 조용히 지냈다. ${n.interests[0]}을(를) 하면서 나 자신과 대화하는 시간을 가졌다. 때로는 이런 고요한 순간이 필요한 법이다.\n\n저녁에 옥상에 올라가니 하늘이 정말 예뻤다. 여기 있는 동안 이 풍경을 자주 봐야겠다.\n\n오늘의 한 줄: 가끔은 천천히 가는 것도 괜찮다.`, ps: null }),
+  (n, day) => ({ title: `특별한 하루`, mood: "⭐", weather: "따뜻함", body: `Day ${day}.\n\n오늘은 유독 특별한 하루였다. ${n.interests[0]}을(를) 하다가 예상치 못한 즐거움을 발견했다.\n\n타마버스의 각 층마다 분위기가 다르다는 걸 새삼 느꼈다. 1층 로비의 편안함, 레스토랑의 따스한 조명, 루프탑의 시원한 바람까지.\n\n이런 공간에서 지내다 보면 일상에서 놓치고 있던 소소한 행복들이 보이기 시작한다.`, ps: `${n.interests[1] || "여행"}의 진짜 의미를 알 것 같다` }),
+  (n, day) => ({ title: `생각이 많은 밤`, mood: "🌜", weather: "안개", body: `Day ${day}, 늦은 밤.\n\n잠이 오지 않아 일기를 쓴다. 요즘 ${n.interests[0]}에 대해 새로운 시각이 생기고 있다.\n\n여기서 만난 사람들은 저마다 다른 이야기를 품고 있었다. 그 다양한 이야기들이 한 공간에서 교차하는 게 타마버스에서 펼쳐지는 다마고치 이야기의 매력인 것 같다.\n\n내일은 어떤 하루가 될까. 그 불확실함이 두렵기도 하지만, 동시에 설레기도 하다.`, ps: null }),
 ];
 
 const SNS_TEMPLATES = [
-  (n, loc) => ({ platform: "Tamaverse_gram", handle: `@${n.name.toLowerCase().replace(/\s/g, "_")}`, body: `📍 ${loc}에서 보내는 여유로운 오후`, hashtags: [`#HotelTamaverse`, `#${n.interests[0]}`, `#호텔라이프`, `#${loc.replace(/\s/g, "")}`], likes: Math.floor(Math.random() * 200) + 50, comments: [{ user: "호텔지기", text: "좋은 시간 보내세요! ✨" }], img: "☕🏨" }),
-  (n) => ({ platform: "Tamaverse_gram", handle: `@${n.name.toLowerCase().replace(/\s/g, "_")}`, body: `오늘 하루도 감사한 마음으로 ✨\n이 호텔에서의 매일이 선물 같다`, hashtags: [`#일상`, `#${n.interests[0]}`, `#호텔생활`, `#감성`], likes: Math.floor(Math.random() * 150) + 30, comments: [{ user: "여행자", text: "분위기 최고 👏" }, { user: "감성러버", text: "나도 가고 싶다 🥺" }], img: "✨🌿" }),
+  (n, loc) => ({ platform: "Tamaverse_gram", handle: `@${n.name.toLowerCase().replace(/\s/g, "_")}`, body: `📍 ${loc}에서 보내는 여유로운 오후`, hashtags: [`#Tamaverse`, `#${n.interests[0]}`, `#타마버스라이프`, `#${loc.replace(/\s/g, "")}`], likes: Math.floor(Math.random() * 200) + 50, comments: [{ user: "타마버스지기", text: "좋은 시간 보내세요! ✨" }], img: "☕🏨" }),
+  (n) => ({ platform: "Tamaverse_gram", handle: `@${n.name.toLowerCase().replace(/\s/g, "_")}`, body: `오늘 하루도 감사한 마음으로 ✨\n이 타마버스에서의 매일이 선물 같다`, hashtags: [`#일상`, `#${n.interests[0]}`, `#타마버스생활`, `#감성`], likes: Math.floor(Math.random() * 150) + 30, comments: [{ user: "여행자", text: "분위기 최고 👏" }, { user: "감성러버", text: "나도 가고 싶다 🥺" }], img: "✨🌿" }),
   (n, loc) => ({ platform: "Tamaverse_gram", handle: `@${n.name.toLowerCase().replace(/\s/g, "_")}`, body: `${loc}의 분위기에 취하는 중 🏨\n${n.interests[0]}을(를) 좋아하는 사람이라면 꼭 와봐야 할 곳`, hashtags: [`#${n.interests[1] || n.interests[0]}`, `#Tamaverse`, `#추천`, `#힐링`], likes: Math.floor(Math.random() * 300) + 80, comments: [{ user: "팔로워1", text: "여기 어디야?!" }, { user: "팔로워2", text: "사진 더 올려줘 📸" }], img: "🏨🌅" }),
-  (n, loc) => ({ platform: "Tamaverse_gram", handle: `@${n.name.toLowerCase().replace(/\s/g, "_")}`, body: `오늘의 ${n.interests[0]} 기록 📝\n매일 조금씩 성장하는 느낌이 좋다`, hashtags: [`#성장`, `#${n.interests[0]}일기`, `#호텔Tamaverse`, `#기록`], likes: Math.floor(Math.random() * 120) + 40, comments: [{ user: "응원단", text: "멋져요! 화이팅! 💪" }], img: "📝💪" }),
+  (n, loc) => ({ platform: "Tamaverse_gram", handle: `@${n.name.toLowerCase().replace(/\s/g, "_")}`, body: `오늘의 ${n.interests[0]} 기록 📝\n매일 조금씩 성장하는 느낌이 좋다`, hashtags: [`#성장`, `#${n.interests[0]}일기`, `#타마버스`, `#기록`], likes: Math.floor(Math.random() * 120) + 40, comments: [{ user: "응원단", text: "멋져요! 화이팅! 💪" }], img: "📝💪" }),
 ];
 
 // ── 엔진 함수: NPC 위치 결정 ──
@@ -620,8 +620,8 @@ function useSimulationEngine(state, dispatch) {
         pending.forEach(pa => {
           if (currentAbs >= pa.arrivalAbs) {
             dispatch({ type: ACTION.ARRIVE_PENDING_NPC, payload: pa.npc });
-            dispatch({ type: ACTION.ADD_FEED_ITEM, payload: { id: nextFeedId(), type: "event", text: `🧳 ${pa.npc.emoji} ${pa.npc.name}이(가) Hotel Tamaverse에 체크인했습니다!`, time: timeStr, day: actualDay } });
-            dispatch({ type: ACTION.ADD_EVENT_LOG, payload: { type: "checkin", title: `${pa.npc.name} 체크인`, description: `${pa.npc.description} ${pa.npc.name}이(가) 호텔에 입주했습니다.`, day: actualDay, time: timeStr, npcsInvolved: [pa.npc.id] } });
+            dispatch({ type: ACTION.ADD_FEED_ITEM, payload: { id: nextFeedId(), type: "event", text: `🧳 ${pa.npc.emoji} ${pa.npc.name}이(가) Tamaverse에 체크인했습니다!`, time: timeStr, day: actualDay } });
+            dispatch({ type: ACTION.ADD_EVENT_LOG, payload: { type: "checkin", title: `${pa.npc.name} 체크인`, description: `${pa.npc.description} ${pa.npc.name}이(가) 타마버스에 입주했습니다.`, day: actualDay, time: timeStr, npcsInvolved: [pa.npc.id] } });
           }
         });
       }
@@ -737,11 +737,11 @@ function useSimulationEngine(state, dispatch) {
       // ── 5. 이벤트 (랜덤, 드문 확률) ──
       if (Math.random() < 0.08) {
         const events = [
-          { title: "갑자기 비가 내린다", desc: "호텔 안의 NPC들이 창밖을 바라보며 생각에 잠겼다.", emoji: "🌧️" },
+          { title: "갑자기 비가 내린다", desc: "타마버스 안의 NPC들이 창밖을 바라보며 생각에 잠겼다.", emoji: "🌧️" },
           { title: "카페 특별 메뉴", desc: "Tamaverse Brew에서 오늘의 특별 메뉴가 공개되었다.", emoji: "☕" },
           { title: "노을이 아름답다", desc: "서쪽 하늘이 붉게 물들었다. 스카이라인에서 보면 장관일 것이다.", emoji: "🌅" },
           { title: "택배가 도착했다", desc: "누군가에게 소포가 배달되었다. 무엇이 들어있을까?", emoji: "📦" },
-          { title: "BGM 변경", desc: "호텔에 잔잔한 재즈 음악이 흐르기 시작했다.", emoji: "🎶" },
+          { title: "BGM 변경", desc: "타마버스에 잔잔한 재즈 음악이 흐르기 시작했다.", emoji: "🎶" },
         ];
         const ev = events[Math.floor(Math.random() * events.length)];
         dispatch({ type: ACTION.ADD_FEED_ITEM, payload: { id: nextFeedId(), type: "event", text: `${ev.emoji} [이벤트] ${ev.title} — ${ev.desc}`, time: timeStr, day: actualDay } });
@@ -832,7 +832,7 @@ function useSimulationEngine(state, dispatch) {
           if (Math.random() < (isIntraDay ? 0.15 : 0.4)) {
             const loc = s.locations.find((l) => l.id === (s.npcStates[npc.id]?.currentLocation || "lobby"));
             const tmpl = SNS_TEMPLATES[Math.floor(Math.random() * SNS_TEMPLATES.length)];
-            const snsData = tmpl(npc, loc?.name || "호텔");
+            const snsData = tmpl(npc, loc?.name || "타마버스");
             setTimeout(() => {
               dispatch({ type: ACTION.ADD_CONTENT, payload: { id: `sns-${npc.id}-d${gameDay}-${Date.now()}`, type: "sns", authorId: npc.id, day: gameDay, text: snsData.body, richData: snsData, createdAt: Date.now() } });
               dispatch({ type: ACTION.ADD_NPC_BUBBLE, payload: { npcId: npc.id, icon: "📱" } });
@@ -923,13 +923,13 @@ function IntroScreen({ dispatch }) {
         ))}
       </div>
       <div className="text-8xl mb-4" style={{ animation: "fadeInUp 0.6s ease-out both", filter: "drop-shadow(0 4px 24px rgba(233,69,96,0.3))" }}>🏨</div>
-      <h1 className="text-6xl font-bold tracking-tight mb-3" style={{ fontFamily: "'Playfair Display', serif", background: "linear-gradient(135deg, #e94560, #ff6b6b)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", animation: "fadeInUp 0.6s ease-out 0.2s both, titleGlow 3s ease-in-out infinite", letterSpacing: "-1px" }}>Hotel Tamaverse</h1>
-      <p className="text-xl mb-14 tracking-wide" style={{ color: COLORS.subtext, animation: "fadeInUp 0.6s ease-out 0.4s both" }}>이돌라 세계 안, 어딘가에 존재하는 호텔</p>
+      <h1 className="text-6xl font-bold tracking-tight mb-3" style={{ fontFamily: "'Playfair Display', serif", background: "linear-gradient(135deg, #e94560, #ff6b6b)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", animation: "fadeInUp 0.6s ease-out 0.2s both, titleGlow 3s ease-in-out infinite", letterSpacing: "-1px" }}>Tamaverse</h1>
+      <p className="text-xl mb-14 tracking-wide" style={{ color: COLORS.subtext, animation: "fadeInUp 0.6s ease-out 0.4s both" }}>다마고치 세계 안, 어딘가에 존재하는 타마버스</p>
       <div className="flex gap-5" style={{ animation: "fadeInUp 0.6s ease-out 0.6s both" }}>
-        <button onClick={() => { if(window.gtag) gtag('event','hotel_checkin',{event_category:'conversion',event_label:'intro_checkin'}); dispatch({ type: ACTION.SET_PHASE, payload: "worldbuilding" }); }} className="px-12 py-4 rounded-xl text-white font-semibold text-xl tracking-wide transition-all duration-300 hover:scale-105 active:scale-95" style={{ background: "linear-gradient(135deg, #e94560, #ff6b6b)", boxShadow: "0 6px 30px rgba(233,69,96,0.4)", minWidth: 220, borderRadius: 50 }}>
+        <button onClick={() => { if(window.gtag) gtag('event','tamaverse_checkin',{event_category:'conversion',event_label:'intro_checkin'}); dispatch({ type: ACTION.SET_PHASE, payload: "worldbuilding" }); }} className="px-12 py-4 rounded-xl text-white font-semibold text-xl tracking-wide transition-all duration-300 hover:scale-105 active:scale-95" style={{ background: "linear-gradient(135deg, #e94560, #ff6b6b)", boxShadow: "0 6px 30px rgba(233,69,96,0.4)", minWidth: 220, borderRadius: 50 }}>
           🏨 체크인하기
         </button>
-        <button onClick={() => { if(window.gtag) gtag('event','hotel_quickstart',{event_category:'conversion',event_label:'intro_quickstart'}); quickStart(); }}
+        <button onClick={() => { if(window.gtag) gtag('event','tamaverse_quickstart',{event_category:'conversion',event_label:'intro_quickstart'}); quickStart(); }}
           className="px-12 py-4 font-semibold text-xl tracking-wide transition-all duration-300 hover:scale-105 active:scale-95"
           style={{ background: "transparent", color: COLORS.subtext, border: `1px solid ${COLORS.border}`, borderRadius: 50, minWidth: 220 }}>
           ⚡ 빠른 시작
@@ -944,8 +944,8 @@ function IntroScreen({ dispatch }) {
 // ═══════════════════════════════════════════════
 
 const WB_TEXTS = [
-  { emoji: "🌍", text: "이돌라 —\n오시즈의 이야기가 펼쳐지는\n신비로운 세계입니다." },
-  { emoji: "🤖", text: "이 호텔에는 AI 에이전트가 살아갑니다.\n각자의 성격, 관심사, 보관함을 갖고\n자유롭게 행동하며 관계를 맺어갑니다." },
+  { emoji: "🌍", text: "타마버스 —\n다마고치의 이야기가 펼쳐지는\n신비로운 공간입니다." },
+  { emoji: "🤖", text: "이 타마버스에는 AI 에이전트가 살아갑니다.\n각자의 성격, 관심사, 보관함을 갖고\n자유롭게 행동하며 관계를 맺어갑니다." },
   { emoji: "🎬", text: "당신은 연출자입니다.\n삶을 설계하고, 감상하고,\n방향을 제시하세요." },
   { emoji: "✨", text: "이제, 당신의 첫 번째\n에이전트를 캐스팅하세요." },
 ];
@@ -1215,7 +1215,7 @@ function CastingStep4({ state, dispatch }) {
       {phase === 0 && (
         <div style={{ animation: "fadeInUp 0.6s ease-out both" }}>
           <p className="text-6xl mb-4">{draft.emoji}</p>
-          <p className="text-lg" style={{ color: COLORS.text }}>{draft.name}이(가) Hotel Tamaverse에 도착했습니다...</p>
+          <p className="text-lg" style={{ color: COLORS.text }}>{draft.name}이(가) Tamaverse에 도착했습니다...</p>
           <p className="text-sm mt-2" style={{ color: COLORS.subtext }}>🏨</p>
         </div>
       )}
@@ -1240,7 +1240,7 @@ function CastingStep4({ state, dispatch }) {
       )}
       {phase === 3 && (
         <div style={{ animation: "fadeInUp 0.4s ease-out both" }}>
-          <p className="text-sm font-medium mb-4" style={{ color: COLORS.text }}>호텔의 다른 투숙객들을 소개합니다</p>
+          <p className="text-sm font-medium mb-4" style={{ color: COLORS.text }}>타마버스의 다른 투숙객들을 소개합니다</p>
           <div className="space-y-2">
             {PRESET_NPCS.slice(0, npcIdx).map((npc) => (
               <div key={npc.id} className="flex items-center gap-3 px-4 py-3 rounded-xl text-left" style={{ background: COLORS.bg, border: `1px solid ${COLORS.border}`, animation: "fadeInUp 0.4s ease-out both" }}>
@@ -1262,9 +1262,9 @@ function CastingStep4({ state, dispatch }) {
         <div style={{ animation: "fadeInUp 0.6s ease-out both" }}>
           <p className="text-5xl mb-3">✨</p>
           <p className="text-lg font-bold mb-1" style={{ color: COLORS.text }}>모든 준비가 완료되었습니다!</p>
-          <p className="text-sm mb-6" style={{ color: COLORS.subtext }}>{draft.name}과(와) 5명의 투숙객이 Hotel Tamaverse에서 생활을 시작합니다.</p>
+          <p className="text-sm mb-6" style={{ color: COLORS.subtext }}>{draft.name}과(와) 5명의 투숙객이 Tamaverse에서 생활을 시작합니다.</p>
           <button onClick={startSim} className="px-8 py-3.5 text-white font-bold text-lg transition-all duration-300 hover:scale-105 active:scale-95" style={{ background: "linear-gradient(135deg, #e94560, #ff6b6b)", boxShadow: "0 6px 30px rgba(233,69,96,0.4)", borderRadius: 50 }}>
-            🏨 호텔 생활 시작
+            🏨 타마버스 생활 시작
           </button>
         </div>
       )}
@@ -1478,7 +1478,7 @@ function ContentDetailModal({ state, dispatch }) {
               <div className="flex items-center gap-2">
                 <span style={{ fontSize: 12 }}>🕰️</span>
                 <span style={{ color: COLORS.subtext, fontSize: 11, fontFamily: "'JetBrains Mono', monospace" }}>
-                  Hotel Tamaverse · Day {c.day} · {mood}
+                  Tamaverse · Day {c.day} · {mood}
                 </span>
               </div>
               <span style={{ color: "rgba(233,69,96,0.5)", fontSize: 20, fontFamily: "'Playfair Display', serif" }}>✦</span>
@@ -2966,7 +2966,7 @@ function MapViewer({ state, dispatch }) {
   // Caster auto-cycling dialogue: rotate between live commentary and ambient lines
   const CASTER_AMBIENT = useMemo(() => [
     `${FLOOR_META[activeFloor]?.title || activeFloor}의 분위기가 정말 좋습니다! 투숙객들의 하루가 궁금하시죠?`,
-    "오늘도 Hotel Tamaverse에서 새로운 이야기가 만들어지고 있습니다~",
+    "오늘도 Tamaverse에서 새로운 이야기가 만들어지고 있습니다~",
     `지금 ${FLOOR_META[activeFloor]?.title || activeFloor}에는 어떤 드라마가 펼쳐지고 있을까요?`,
     "캐스터가 실시간으로 전해드리겠습니다! 놓치지 마세요~",
     `투숙객들 사이에 미묘한 감정선이 흐르고 있는 것 같은데요...`,
@@ -3234,14 +3234,14 @@ const MINI_APP_CONFIGS = {
       { label: "추출 방식", options: ["☕ 핸드드립", "🫖 에어로프레스", "🔧 모카포트", "💧 콜드브루"] },
     ],
     resultTexts: { perfect: "바리스타급 에스프레소 완성! ☕✨", good: "향긋한 커피가 완성됐어요", miss: "조금 쓰지만... 괜찮아요 😅" },
-    lore: "이돌 브루는 1층 로비 한쪽에 위치한 셀프 커피 바입니다.\n로스팅된 원두의 향이 로비 전체를 감싸고 있어요.",
+    lore: "타마버스 브루는 1층 로비 한쪽에 위치한 셀프 커피 바입니다.\n로스팅된 원두의 향이 로비 전체를 감싸고 있어요.",
   },
   reading: {
     title: "BOOK CORNER", subtitle: "오늘의 추천 도서",
     accent: "#6B8E6B", bg: "linear-gradient(135deg, rgba(107,142,107,0.08), rgba(78,205,196,0.04))",
     books: [
-      { emoji: "📕", title: "여행은 도착이 아닌 과정이다", author: "김이돌", genre: "에세이", quote: "우리는 모두 어딘가를 향해 걷고 있지만, 정작 중요한 건 지금 이 걸음이다." },
-      { emoji: "📗", title: "호텔에서 보낸 여름", author: "박소라", genre: "소설", quote: "창밖의 비가 그치면 우리는 다시 낯선 사람이 될까." },
+      { emoji: "📕", title: "여행은 도착이 아닌 과정이다", author: "김다마고치", genre: "에세이", quote: "우리는 모두 어딘가를 향해 걷고 있지만, 정작 중요한 건 지금 이 걸음이다." },
+      { emoji: "📗", title: "타마버스에서 보낸 여름", author: "박소라", genre: "소설", quote: "창밖의 비가 그치면 우리는 다시 낯선 사람이 될까." },
       { emoji: "📘", title: "작은 세계의 큰 이야기", author: "이하루", genre: "판타지", quote: "80명이 만드는 세계는 80억의 세계만큼이나 복잡하다." },
     ],
     lore: "북 코너는 로비 소파 옆에 마련된 아늑한 독서 공간입니다.\n투숙객들이 기증한 책들이 가득 차 있어요.",
@@ -3258,14 +3258,14 @@ const MINI_APP_CONFIGS = {
     lore: "로비 정원은 투숙객들이 함께 가꾸는 작은 초록 공간이에요.\n매일 아침 누군가 물을 주고, 저녁에는 함께 구경해요.",
   },
   guestbook: {
-    title: "GUEST BOOK", subtitle: "이돌에서의 기억을 남겨주세요",
+    title: "GUEST BOOK", subtitle: "타마버스에서의 기억을 남겨주세요",
     accent: "#D4956B", bg: "linear-gradient(135deg, rgba(212,149,107,0.08), rgba(233,69,96,0.04))",
     prevEntries: [
-      { name: "익명의 투숙객", msg: "이 호텔에서 시간이 천천히 흐르는 걸 느꼈어요 🌙", day: 3 },
-      { name: "여행자 K", msg: "다시 올 때까지, 안녕 이돌 👋", day: 5 },
+      { name: "익명의 투숙객", msg: "이 타마버스에서 시간이 천천히 흐르는 걸 느꼈어요 🌙", day: 3 },
+      { name: "여행자 K", msg: "다시 올 때까지, 안녕 타마버스 👋", day: 5 },
       { name: "하루", msg: "여기서 만난 사람들을 오래 기억할 것 같아요 ✨", day: 2 },
     ],
-    messages: ["이 호텔 최고! 🏨", "멋진 하루였어요 ✨", "또 올게요 💕", "여기서의 시간이 특별했어요 🌟", "모두에게 감사해요 💛"],
+    messages: ["이 타마버스 최고! 🏨", "멋진 하루였어요 ✨", "또 올게요 💕", "여기서의 시간이 특별했어요 🌟", "모두에게 감사해요 💛"],
     lore: "프론트 데스크 옆에 놓인 가죽 표지 방명록입니다.\n떠나는 투숙객들이 하나씩 메시지를 남기고 갑니다.",
   },
   roomservice: {
@@ -3285,7 +3285,7 @@ const MINI_APP_CONFIGS = {
     menu: [
       { emoji: "🧃", name: "제주 감귤 주스", desc: "신선한 감귤 100%", price: "★" },
       { emoji: "🥤", name: "수제 레모네이드", desc: "레몬과 라벤더", price: "★" },
-      { emoji: "🍺", name: "크래프트 맥주", desc: "이돌 브루어리 IPA", price: "★★" },
+      { emoji: "🍺", name: "크래프트 맥주", desc: "타마버스 브루어리 IPA", price: "★★" },
       { emoji: "🫧", name: "스파클링 워터", desc: "프리미엄 탄산수", price: "★" },
     ],
     lore: "객실마다 비치된 미니바에는 엄선된 음료가 준비되어 있습니다.\n매일 아침 새롭게 보충됩니다.",
@@ -3305,9 +3305,9 @@ const MINI_APP_CONFIGS = {
     title: "WINE CELLAR", subtitle: "와인 테이스팅 체험",
     accent: "#722F37", bg: "linear-gradient(135deg, rgba(114,47,55,0.1), rgba(233,69,96,0.04))",
     wines: [
-      { emoji: "🍷", name: "샤또 이돌 2019", type: "레드", note: "체리와 오크향, 부드러운 타닌", pair: "스테이크" },
-      { emoji: "🥂", name: "이돌 스파클링", type: "스파클링", note: "청사과와 시트러스, 섬세한 버블", pair: "해산물" },
-      { emoji: "🍾", name: "이돌 로제", type: "로제", note: "딸기와 장미향, 상큼한 마무리", pair: "샐러드" },
+      { emoji: "🍷", name: "샤또 다마고치 2019", type: "레드", note: "체리와 오크향, 부드러운 타닌", pair: "스테이크" },
+      { emoji: "🥂", name: "다마고치 스파클링", type: "스파클링", note: "청사과와 시트러스, 섬세한 버블", pair: "해산물" },
+      { emoji: "🍾", name: "다마고치 로제", type: "로제", note: "딸기와 장미향, 상큼한 마무리", pair: "샐러드" },
     ],
     resultTexts: { perfect: "소믈리에급 테이스팅! 🍷✨", good: "와인을 한 모금 음미했다", miss: "조금 취했나... 🥴" },
     lore: "3층 레스토랑 안쪽에 위치한 와인 셀러에는\n50여 종의 와인이 보관되어 있습니다.",
@@ -3327,9 +3327,9 @@ const MINI_APP_CONFIGS = {
     title: "OPEN MIC", subtitle: "오늘 밤의 스타는 바로 당신",
     accent: "#E94560", bg: "linear-gradient(135deg, rgba(233,69,96,0.08), rgba(123,97,255,0.04))",
     songs: [
-      { emoji: "🎵", title: "이돌의 밤", artist: "Hotel Band", difficulty: "★★" },
+      { emoji: "🎵", title: "다마고치의 밤", artist: "Tamaverse Band", difficulty: "★★" },
       { emoji: "🎶", title: "별이 빛나는 밤에", artist: "Tamaverse OST", difficulty: "★★★" },
-      { emoji: "🎤", title: "안녕, 이돌", artist: "투숙객 합창단", difficulty: "★" },
+      { emoji: "🎤", title: "안녕, 다마고치", artist: "투숙객 합창단", difficulty: "★" },
     ],
     resultTexts: { perfect: "관객들의 환호가 터진다! 🎉🎊", good: "꽤 괜찮은 무대였어요 👏", miss: "다음엔 더 잘할 수 있어요 😅" },
     lore: "4층 공연장의 오픈마이크는 매일 저녁 열립니다.\n누구나 무대에 설 수 있어요. 용기만 있다면!",
@@ -3348,7 +3348,7 @@ const MINI_APP_CONFIGS = {
     title: "SUNSET HOUR", subtitle: "선셋 칵테일을 만들어보세요",
     accent: "#FF6B35", bg: "linear-gradient(135deg, rgba(255,107,53,0.1), rgba(233,69,96,0.04))",
     recipes: [
-      { emoji: "🍹", name: "이돌 선셋", base: "럼", mixer: "오렌지 주스 + 그레나딘", color: "#FF6B35" },
+      { emoji: "🍹", name: "다마고치 선셋", base: "럼", mixer: "오렌지 주스 + 그레나딘", color: "#FF6B35" },
       { emoji: "🍸", name: "스카이라인 토닉", base: "진", mixer: "토닉워터 + 라임", color: "#4ecdc4" },
       { emoji: "🥃", name: "루프탑 올드패션드", base: "버번", mixer: "앙고스투라 비터 + 오렌지", color: "#D4956B" },
     ],
@@ -3384,7 +3384,7 @@ const MINI_APP_CONFIGS = {
       { emoji: "💤", name: "숙면 모드", desc: "푹 자고 일어나기", duration: "8시간" },
       { emoji: "🧘", name: "명상 모드", desc: "눈 감고 호흡에 집중", duration: "15분" },
     ],
-    lore: "이돌의 객실 침대는 특별 주문 매트리스를 사용합니다.\n베개는 3종류 중에 고를 수 있어요.",
+    lore: "다마고치의 객실 침대는 특별 주문 매트리스를 사용합니다.\n베개는 3종류 중에 고를 수 있어요.",
   },
   closet: {
     title: "WARDROBE", subtitle: "오늘의 코디를 골라보세요",
@@ -3401,21 +3401,21 @@ const MINI_APP_CONFIGS = {
     title: "THE TABLE", subtitle: "오늘의 식사 자리를 잡아보세요",
     accent: "#E8B96B", bg: "linear-gradient(135deg, rgba(232,185,107,0.08), rgba(233,69,96,0.04))",
     seats: [
-      { emoji: "🪟", name: "창가 자리", desc: "호텔 정원이 보이는 자리" },
+      { emoji: "🪟", name: "창가 자리", desc: "타마버스 정원이 보이는 자리" },
       { emoji: "🕯️", name: "캔들 테이블", desc: "은은한 조명의 2인석" },
       { emoji: "👥", name: "라운드 테이블", desc: "투숙객들과 함께하는 공동석" },
     ],
-    lore: "더 테이블은 이돌의 메인 다이닝 공간입니다.\n아침·점심·저녁 식사가 제공됩니다.",
+    lore: "더 테이블은 타마버스의 메인 다이닝 공간입니다.\n아침·점심·저녁 식사가 제공됩니다.",
   },
   show: {
     title: "STAGE Tamaverse", subtitle: "오늘의 공연을 감상하세요",
     accent: "#E94560", bg: "linear-gradient(135deg, rgba(233,69,96,0.08), rgba(123,97,255,0.04))",
     shows: [
       { emoji: "🎭", name: "즉흥 연극", desc: "투숙객 참여형 연극", time: "19:00" },
-      { emoji: "🎵", name: "재즈 라이브", desc: "호텔 전속 밴드 공연", time: "20:30" },
-      { emoji: "🎪", name: "마술 쇼", desc: "호텔 마술사의 특별 공연", time: "21:00" },
+      { emoji: "🎵", name: "재즈 라이브", desc: "타마버스 전속 밴드 공연", time: "20:30" },
+      { emoji: "🎪", name: "마술 쇼", desc: "타마버스 마술사의 특별 공연", time: "21:00" },
     ],
-    lore: "4층 스테이지는 이돌의 문화 공간입니다.\n매일 저녁 다양한 공연이 펼쳐집니다.",
+    lore: "4층 스테이지는 타마버스의 문화 공간입니다.\n매일 저녁 다양한 공연이 펼쳐집니다.",
   },
   instruments: {
     title: "MUSIC CORNER", subtitle: "악기를 연주해보세요",
@@ -4668,8 +4668,8 @@ function VersionUpModal({ state, dispatch }) {
     dispatch({ type: ACTION.VERSION_UP });
     if (nextV === "1.2" && !(state.npcs.branded || []).find(n => n.id === "luna")) {
       dispatch({ type: ACTION.ADD_BRANDED_NPC, payload: BRANDED_NPC_LUNA });
-      dispatch({ type: ACTION.ADD_FEED_ITEM, payload: { id: `f-luna-${Date.now()}`, type: "event", text: "🧥 루나(LUNA Fashion)가 Hotel Tamaverse에 체크인했습니다!", time: formatGameTime(state.simulation.gameTime), day: state.simulation.gameDay } });
-      dispatch({ type: ACTION.ADD_EVENT_LOG, payload: { type: "special", title: "루나 입주", description: "LUNA Fashion 크리에이티브 디렉터 루나가 호텔에 입주했습니다.", day: state.simulation.gameDay, time: formatGameTime(state.simulation.gameTime), npcsInvolved: ["luna"] } });
+      dispatch({ type: ACTION.ADD_FEED_ITEM, payload: { id: `f-luna-${Date.now()}`, type: "event", text: "🧥 루나(LUNA Fashion)가 Tamaverse에 체크인했습니다!", time: formatGameTime(state.simulation.gameTime), day: state.simulation.gameDay } });
+      dispatch({ type: ACTION.ADD_EVENT_LOG, payload: { type: "special", title: "루나 입주", description: "LUNA Fashion 크리에이티브 디렉터 루나가 타마버스에 입주했습니다.", day: state.simulation.gameDay, time: formatGameTime(state.simulation.gameTime), npcsInvolved: ["luna"] } });
     }
     if (nextV === "1.1") dispatch({ type: ACTION.ADD_FEED_ITEM, payload: { id: `f-v11-${Date.now()}`, type: "event", text: "🎭 4F 공연장 'Stage Tamaverse'이 오픈!", time: formatGameTime(state.simulation.gameTime), day: state.simulation.gameDay } });
     // Schedule version NPCs for staggered arrival
@@ -4687,7 +4687,7 @@ function VersionUpModal({ state, dispatch }) {
   return (<ModalOverlay width={520} onClose={() => dispatch({ type: ACTION.CLOSE_MODAL })}><div className="rounded-2xl p-7" style={{ ...MODAL_W, background: COLORS.card, border: `2px solid ${COLORS.border}` }}>
     <p className="text-center mb-3" style={{ fontSize: 44 }}>🎉</p>
     <h3 className="font-bold text-center mb-1" style={{ color: COLORS.text, fontSize: 22 }}>{info.title}</h3>
-    <p className="text-center mb-5" style={{ color: COLORS.subtext, fontSize: 14 }}>Hotel Tamaverse 업데이트</p>
+    <p className="text-center mb-5" style={{ color: COLORS.subtext, fontSize: 14 }}>Tamaverse 업데이트</p>
     <div className="space-y-2.5 mb-6">{info.features.map((f, i) => (<div key={i} className="flex items-center gap-3 px-4 py-3 rounded-xl" style={{ background: COLORS.bg, border: `1px solid ${COLORS.border}` }}><span style={{ fontSize: 24, flexShrink: 0 }}>{f.emoji}</span><p style={{ color: COLORS.text, fontSize: 15 }}>{f.text}</p></div>))}</div>
     <button onClick={handleApply} className="w-full py-3.5 rounded-xl text-white font-bold transition-all hover:scale-[1.02]" style={{ background: COLORS.accent, fontSize: 16 }}>업데이트 적용 ✨</button>
     <button onClick={() => dispatch({ type: ACTION.CLOSE_MODAL })} className="w-full py-3 rounded-lg mt-2" style={{ color: COLORS.subtext, fontSize: 14 }}>취소</button>
@@ -4710,7 +4710,7 @@ function StoryExportModal({ state, dispatch }) {
   const [selected, setSelected] = useState([]); const [preview, setPreview] = useState("");
   const opts = [{ id: "timeline", label: "📋 전체 타임라인", desc: "Day 1부터 시간순" }, { id: "npcArc", label: "👤 NPC별 아크", desc: "개인 여정" }, { id: "relationship", label: "💕 관계 스토리라인", desc: "관계 발전사" }, { id: "highlight", label: "✨ 콘텐츠 하이라이트", desc: "인기 SNS·일기 모음" }, { id: "ipExtend", label: "🎬 IP 확장 추천", desc: "TOP 3 + 포맷" }];
   const toggle = id => setSelected(p => p.includes(id) ? p.filter(x => x !== id) : [...p, id]);
-  const gen = () => { let md = `# 🏨 Hotel Tamaverse 스토리북\n> ${state.simulation.gameDay}일 | v${state.currentVersion} | ${getAllNpcs(state).length}명\n---\n`;
+  const gen = () => { let md = `# 🏨 Tamaverse 스토리북\n> ${state.simulation.gameDay}일 | v${state.currentVersion} | ${getAllNpcs(state).length}명\n---\n`;
     if (selected.includes("timeline")) { md += "## 📋 타임라인\n"; state.eventLog.forEach(ev => { md += `- [D${ev.day} ${ev.time}] ${ev.title}: ${ev.description}\n`; }); md += "\n"; }
     if (selected.includes("npcArc")) { md += "## 👤 NPC 아크\n"; getAllNpcs(state).forEach(n => { md += `### ${n.emoji} ${n.name}\n`; const c = state.contents.filter(x => x.authorId === n.id); c.forEach(x => { md += `- ${x.type === "diary" ? "일기" : "SNS"} Day ${x.day}\n`; }); md += "\n"; }); }
     if (selected.includes("relationship")) { md += "## 💕 관계\n"; state.relationships.filter(r => r.history.length > 0).forEach(r => { const a = getNpc(state, r.npcA), b = getNpc(state, r.npcB); if (a && b) { md += `### ${a.name} ↔ ${b.name} (${r.score.toFixed(1)})\n`; r.history.forEach(h => { md += `- ${h.event} (${h.change >= 0 ? "+" : ""}${h.change})\n`; }); md += "\n"; } }); }
@@ -4731,7 +4731,7 @@ function StoryExportModal({ state, dispatch }) {
         });
       }
     }
-    if (selected.includes("ipExtend")) { md += "## 🎬 IP 확장 추천\n"; md += "- 웹드라마: Hotel Tamaverse 시즌 1\n- 캐릭터 굿즈: 아크릴 스탠드\n- OST 앨범: Tamaverse Sound Collection\n\n"; }
+    if (selected.includes("ipExtend")) { md += "## 🎬 IP 확장 추천\n"; md += "- 웹드라마: Tamaverse 시즌 1\n- 캐릭터 굿즈: 아크릴 스탠드\n- OST 앨범: Tamaverse Sound Collection\n\n"; }
     setPreview(md);
   };
   return (<ModalOverlay width={520} onClose={() => dispatch({ type: ACTION.CLOSE_MODAL })}><div className="rounded-2xl p-7" style={{ ...MODAL_W, maxHeight: "85vh", overflowY: "auto", background: COLORS.card, border: `2px solid ${COLORS.border}` }}>
@@ -4745,7 +4745,7 @@ function StoryExportModal({ state, dispatch }) {
 
 function ExternalShareModal({ state, dispatch }) {
   const item = state.ui.modalData; if (!item) return null;
-  const ch = [{ id: "tw", emoji: "🐦", name: "Twitter/X", p: `[Hotel Tamaverse] ${item.text}` }, { id: "ig", emoji: "📷", name: "Instagram", p: `🏨 Hotel Tamaverse\n${item.text}` }, { id: "yt", emoji: "▶️", name: "YouTube", p: item.text }];
+  const ch = [{ id: "tw", emoji: "🐦", name: "Twitter/X", p: `[Tamaverse] ${item.text}` }, { id: "ig", emoji: "📷", name: "Instagram", p: `🏨 Tamaverse\n${item.text}` }, { id: "yt", emoji: "▶️", name: "YouTube", p: item.text }];
   return (<ModalOverlay width={520} onClose={() => dispatch({ type: ACTION.CLOSE_MODAL })}><div className="rounded-2xl p-6" style={{ ...MODAL_W, background: COLORS.card, border: `2px solid ${COLORS.border}` }}>
     <h3 className="font-bold mb-4" style={{ color: COLORS.text, fontSize: 18 }}>📤 외부 송출</h3>
     <div className="space-y-2 mb-4">{ch.map(c => (<div key={c.id} className="flex items-start gap-3 px-3 py-3 rounded-xl" style={{ background: COLORS.bg, border: `1px solid ${COLORS.border}` }}><span style={{ fontSize: 22 }}>{c.emoji}</span><div className="flex-1 min-w-0"><p style={{ color: COLORS.text, fontSize: 14, fontWeight: 600 }}>{c.name}</p><p className="truncate" style={{ color: COLORS.subtext, fontSize: 12 }}>{c.p}</p></div><button onClick={() => navigator.clipboard?.writeText(c.p)} className="shrink-0 px-3 py-1.5 rounded-lg" style={{ background: COLORS.accent, color: "#fff", fontSize: 13 }}>복사</button></div>))}</div>
@@ -4761,7 +4761,7 @@ function EmptyState({ icon, title, sub }) {
 function SimHeader({ state }) {
   return (
     <header className="flex items-center justify-between px-5 shrink-0" style={{ height: 48, background: COLORS.bgElevated, borderBottom: `1px solid ${COLORS.border}` }}>
-      <div className="flex items-center gap-2"><span style={{ fontSize: 20 }}>🏨</span><span style={{ color: COLORS.text, fontWeight: 800, fontSize: 17, fontFamily: "'Playfair Display', serif", background: "linear-gradient(135deg, #e94560, #ff6b6b)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", letterSpacing: 1 }}>Hotel Tamaverse</span></div>
+      <div className="flex items-center gap-2"><span style={{ fontSize: 20 }}>🏨</span><span style={{ color: COLORS.text, fontWeight: 800, fontSize: 17, fontFamily: "'Playfair Display', serif", background: "linear-gradient(135deg, #e94560, #ff6b6b)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", letterSpacing: 1 }}>Tamaverse</span></div>
       <div className="flex items-center gap-3">
         <span style={{ fontFamily: "'JetBrains Mono', monospace", fontWeight: 700, color: COLORS.accent, fontSize: 13, padding: "2px 8px", background: "rgba(233,69,96,0.12)", borderRadius: 20, border: "1px solid rgba(233,69,96,0.25)" }}>v{state.currentVersion}</span>
         {versionGte(state.currentVersion, "1.2") && <span style={{ fontFamily: "'JetBrains Mono', monospace", color: COLORS.expansion, fontWeight: 700, fontSize: 13 }}>💰 {state.credits} 샤드</span>}
@@ -4830,7 +4830,7 @@ function SimulationScreen({ state, dispatch }) {
 // 11. 루트 컴포넌트
 // ═══════════════════════════════════════════════
 
-export default function HotelTamaverseApp() {
+export default function TamaverseApp() {
   const [state, dispatch] = useReducer(gameReducer, INITIAL_STATE);
   return (
     <>

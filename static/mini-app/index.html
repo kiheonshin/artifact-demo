@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>오시즈 컴패니언 앱 플랫폼 시뮬레이터</title>
+<title>다마고치 컴패니언 앱 · 타마버스 플랫폼 시뮬레이터</title>
 <!-- GA4 -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-JM5QR63VMC"></script>
 <script>
@@ -80,9 +80,9 @@ var EV=[
 var EV_DAYS=new Set(EV.map(function(e){return e.d}));
 function seededRand(seed){var s=seed;return function(){s=(s*16807+0)%2147483647;return(s-1)/2147483646;};}
 var _r=seededRand(42);
-var AN=["포토부스","비밀편지","운명의갈림길","밈메이커","이돌라타임즈","NPC캐스팅","드레스룸","이돌라법안","이돌라CCTV","이상형월드컵","관계도트래커","모먼트리퀘스트","숨은캐릭터찾기","1분팬픽","팬덤챔피언십","이돌라엽서","캐릭터셔플대화","도전퀘스트","팬아트갤러리","성격테스트","세계관퀴즈","굿즈커스텀","캐릭터요리","별자리매칭","이돌라라디오","소원트리","캐릭터대화","팬클럽","이돌라극장","캐릭터일기"];
+var AN=["포토부스","비밀편지","운명의갈림길","밈메이커","타마버스타임즈","NPC캐스팅","드레스룸","타마버스법안","타마버스CCTV","이상형월드컵","관계도트래커","모먼트리퀘스트","숨은캐릭터찾기","1분팬픽","팬덤챔피언십","타마버스엽서","캐릭터셔플대화","도전퀘스트","팬아트갤러리","성격테스트","세계관퀴즈","굿즈커스텀","캐릭터요리","별자리매칭","타마버스라디오","소원트리","캐릭터대화","팬클럽","타마버스극장","캐릭터일기"];
 var AE=["📷","📬","⚔","😂","📰","🎬","👗","📜","📹","🏆","🔗","🌟","🔍","📝","🏅","💌","🎭","🎯","🎨","🧪","❓","🛍","🍳","⭐","📻","🌳","💬","👥","🎪","📖"];
-var AD=["캐릭터 사진 촬영","캐릭터에게 편지","스토리 선택지 투표","캐릭터 밈 생성","세계관 뉴스","NPC 역할 커스텀","캐릭터 코디","세계 법안 투표","세계관 카메라","이상형 투표","관계 추적","모먼트 요청","히든 캐릭터","1분 창작","팬 대회","엽서 제작","랜덤 대화","일일 퀘스트","팬아트 전시","성격 분석","세계관 퀴즈","굿즈 제작","요리 체험","별자리 매칭","캐릭터 라디오","소원 나무","캐릭터 대화","팬클럽 활동","이돌라 극장","캐릭터 일기장"];
+var AD=["캐릭터 사진 촬영","캐릭터에게 편지","스토리 선택지 투표","캐릭터 밈 생성","세계관 뉴스","NPC 역할 커스텀","캐릭터 코디","세계 법안 투표","세계관 카메라","이상형 투표","관계 추적","모먼트 요청","히든 캐릭터","1분 창작","팬 대회","엽서 제작","랜덤 대화","일일 퀘스트","팬아트 전시","성격 분석","세계관 퀴즈","굿즈 제작","요리 체험","별자리 매칭","캐릭터 라디오","소원 나무","캐릭터 대화","팬클럽 활동","타마버스 극장","캐릭터 일기장"];
 var AXS=["✨","💌","🗳","🎨","🔭"];
 var ALL_APPS=[];
 (function(){var day=1;for(var i=0;i<50;i++){var iv=i===0?1:Math.floor(_r()*4)+3;if(i>0)day+=iv;var ip=i>=15&&_r()>0.6;var i3=i>=25&&_r()>0.5;var cc=ip?Math.floor(_r()*3+1)*10:0;ALL_APPS.push({id:"a"+i,d:Math.min(day,235),e:AE[i%30],n:i<30?AN[i]:"앱"+(i+1),ax:AXS[i%5],desc:i<30?AD[i]:"컴패니언 앱",isPremium:ip,is3rd:i3,creditCost:cc});}})();
@@ -105,7 +105,7 @@ var REV_KEYS=[
 ];
 var REV_CTL=[[0,8000],[30,7600],[60,6800],[90,6400],[120,6000],[180,5200],[240,4800]];
 var BANNERS=[
-  {minDay:0,text:"🎮 오시즈 메인 게임에서 새로운 모험이 시작됩니다!",color:T.accent},
+  {minDay:0,text:"🎮 다마고치 메인 게임에서 새로운 모험이 시작됩니다!",color:T.accent},
   {minDay:45,text:"⚔ 시즌 1 업데이트 — 새로운 스토리 공개!",color:T.balance},
   {minDay:90,text:"🔗 파트너 개방 — 서드파티 합류!",color:T.balance},
   {minDay:180,text:"🎨 크리에이터 생태계 개방!",color:T.core}
@@ -358,7 +358,7 @@ function L2(){
       {/* Header bar — store style, FIXED */}
       <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"6px 12px",borderBottom:"1px solid "+T.border,flexShrink:0,background:"linear-gradient(180deg,"+T.panel+","+T.bg+")"}}>
         <div style={{display:"flex",alignItems:"center",gap:6}}>
-          <div style={{width:3,height:16,borderRadius:2,background:T.L.L2}}/><span style={{color:T.L.L2,fontSize:13,fontWeight:700}}>{"📱 Tamaverse 앱 스토어"}</span>
+          <div style={{width:3,height:16,borderRadius:2,background:T.L.L2}}/><span style={{color:T.L.L2,fontSize:13,fontWeight:700}}>{"📱 타마버스 앱 스토어"}</span>
           <span style={{fontFamily:mono,fontSize:9,color:T.t3,padding:"2px 7px",borderRadius:8,background:"rgba(255,255,255,0.04)"}}>{apps.length+" apps"}</span>
         </div>
         {launched&&<div style={{display:"flex",alignItems:"center",gap:5}}>
